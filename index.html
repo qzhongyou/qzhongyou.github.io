@@ -51,9 +51,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -176,7 +176,7 @@
 <li>重命名远程仓库。<code>git remote rename dev redev</code>。</li>
 <li>删除远程仓库。 <code>git remote rm dev</code></li>
 <li><p><code>git remote show [remote-name]</code>查看某个远程仓库的详细信息.</p>
-   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">		 	$ git remote show node</span><br><span class="line">		 	* remote node</span><br><span class="line">	  	 	Fetch URL: git@github.com:qzhongyou/node.git</span><br><span class="line">	  	 	Push  URL: git@github.com:qzhongyou/node.git</span><br><span class="line">	  	 	HEAD branch: master</span><br><span class="line">	  	 	Remote branches:</span><br><span class="line">	     		dev    tracked</span><br><span class="line">	   	 	 	master tracked</span><br><span class="line">	  	 	Local refs configured for &apos;git push&apos;:</span><br><span class="line">	     		dev    pushes to dev    (up to date)</span><br><span class="line">	     		master pushes to master (fast-forwardable)</span><br><span class="line">		 ``` 		</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">* __git fetch__</span><br><span class="line">	+ `$ git fetch node`.比如说，要抓取所有 Paul 有的，但本地仓库没有的信息，可以运行 `git fetch pb`。然后将远程仓库拉下来的代码合并本地仓库`git merge node/master`</span><br><span class="line">	+ 如果是克隆了一个仓库，此命令会自动将远程仓库归于 origin 名下.有一点很重要，需要记住，fetch 命令只是将远端的数据拉到本地仓库，并不自动合并到当前工作分支，只有</span><br><span class="line">	当你确实准备好了，才能手工合并。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">###分支</span><br><span class="line">* __分支创建__</span><br><span class="line">	+ 本地分支创建，`git branch dev`。`git branch`分支查看。`git cheakout -b dev`创建分支dev，并切换分支。</span><br><span class="line">	+ 远程分支创建。`git branch dev`之后，`git push origin dev`。创建远程分支。</span><br><span class="line">* __分支参看__</span><br><span class="line"> 	+ 本地分支查看`git branch`</span><br><span class="line">	+远程和本地分支查看`git branch -a`</span><br><span class="line">* __分支切换__</span><br><span class="line">	+ `git checkout dev`</span><br><span class="line">* __删除分支__</span><br><span class="line">	+ 本地分支删除。`git branch -d dev`</span><br><span class="line">	+ 远程分支删除。`git push origin --delete dev`或者`git push [远程名] :[分支名]`</span><br><span class="line">* __跟踪远程分支__</span><br><span class="line">	+ `git checkout -b [分支名] [远程名]/[分支名]`,例如：`$ git checkout -b sf origin/serverfix`现在你的本地分支 sf 会自动将推送和抓取数据的位置定位到 origin/serverfi</span><br><span class="line">	x 了</span><br><span class="line">	+ 如果你有 1.6.2 以上版本的 Git，还可以用 --track 选项简化：`$ git checkout --track origin/serverfix`</span><br><span class="line">	+ 远程分支删除。`git push origin --delete dev`</span><br><span class="line">* __分支的衍合__</span><br><span class="line">	+ `git checkout experiment`然后就行修改文件，`commit`， `$ git rebase master`.现在回到 master 分支，进行一次快进合并`git merge experiment`</span><br><span class="line">	它的原理是回到两个分支最近的共同祖先，根据当前分支（也就是要进行衍合的分支 experiment）后续的历次提交对象（这里只有一个 C3），生成一系列文件补丁，然后以基底分支（也就是主干分支 master）最后一个提交对象（C4）为新的出发点，逐个应用之前准备好的补丁文件，最后会生成一个新的合并提交对象（C3&apos;），从而改写 experiment 的提交历史，使它成为 master 分支的直接下游:</span><br><span class="line">	![alt text](images/rebase.png &quot;分支rebase&quot;)</span><br><span class="line">	![alt text](images/merge.png &quot;分支merge&quot;)</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">###技巧和窍门</span><br><span class="line">* </span><br><span class="line">__自动补全__</span><br><span class="line">	+ 输入 Git 命令的时候可以敲两次跳格键（Tab）例如：`$ git co&lt;tab&gt;&lt;tab&gt;`将输出`commit config`</span><br><span class="line">* __Git 命令别名__</span><br><span class="line">	+ 例如：</span><br></pre></td></tr></table></figure>
+   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">		 	$ git remote show node</span><br><span class="line">		 	* remote node</span><br><span class="line">	  	 	Fetch URL: git@github.com:qzhongyou/node.git</span><br><span class="line">	  	 	Push  URL: git@github.com:qzhongyou/node.git</span><br><span class="line">	  	 	HEAD branch: master</span><br><span class="line">	  	 	Remote branches:</span><br><span class="line">	     		dev    tracked</span><br><span class="line">	   	 	 	master tracked</span><br><span class="line">	  	 	Local refs configured for &apos;git push&apos;:</span><br><span class="line">	     		dev    pushes to dev    (up to date)</span><br><span class="line">	     		master pushes to master (fast-forwardable)</span><br><span class="line">		 												``` 		</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">* __git fetch__</span><br><span class="line">	+ `$ git fetch node`.比如说，要抓取所有 Paul 有的，但本地仓库没有的信息，可以运行 `git fetch pb`。然后将远程仓库拉下来的代码合并本地仓库`git merge node/master`</span><br><span class="line">	+ 如果是克隆了一个仓库，此命令会自动将远程仓库归于 origin 名下.有一点很重要，需要记住，fetch 命令只是将远端的数据拉到本地仓库，并不自动合并到当前工作分支，只有</span><br><span class="line">	当你确实准备好了，才能手工合并。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">### 分支</span><br><span class="line">* __分支创建__</span><br><span class="line">	+ 本地分支创建，`git branch dev`。`git branch`分支查看。`git cheakout -b dev`创建分支dev，并切换分支。</span><br><span class="line">	+ 远程分支创建。`git branch dev`之后，`git push origin dev`。创建远程分支。</span><br><span class="line">* __分支参看__</span><br><span class="line"> 	+ 本地分支查看`git branch`</span><br><span class="line">	+远程和本地分支查看`git branch -a`</span><br><span class="line">* __分支切换__</span><br><span class="line">	+ `git checkout dev`</span><br><span class="line">* __删除分支__</span><br><span class="line">	+ 本地分支删除。`git branch -d dev`</span><br><span class="line">	+ 远程分支删除。`git push origin --delete dev`或者`git push [远程名] :[分支名]`</span><br><span class="line">* __跟踪远程分支__</span><br><span class="line">	+ `git checkout -b [分支名] [远程名]/[分支名]`,例如：`$ git checkout -b sf origin/serverfix`现在你的本地分支 sf 会自动将推送和抓取数据的位置定位到 origin/serverfi</span><br><span class="line">	x 了</span><br><span class="line">	+ 如果你有 1.6.2 以上版本的 Git，还可以用 --track 选项简化：`$ git checkout --track origin/serverfix`</span><br><span class="line">	+ 远程分支删除。`git push origin --delete dev`</span><br><span class="line">* __分支的衍合__</span><br><span class="line">	+ `git checkout experiment`然后就行修改文件，`commit`， `$ git rebase master`.现在回到 master 分支，进行一次快进合并`git merge experiment`</span><br><span class="line">	它的原理是回到两个分支最近的共同祖先，根据当前分支（也就是要进行衍合的分支 experiment）后续的历次提交对象（这里只有一个 C3），生成一系列文件补丁，然后以基底分支（也就是主干分支 master）最后一个提交对象（C4）为新的出发点，逐个应用之前准备好的补丁文件，最后会生成一个新的合并提交对象（C3&apos;），从而改写 experiment 的提交历史，使它成为 master 分支的直接下游:</span><br><span class="line">	![alt text](images/rebase.png &quot;分支rebase&quot;)</span><br><span class="line">	![alt text](images/merge.png &quot;分支merge&quot;)</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">###技巧和窍门</span><br><span class="line">* </span><br><span class="line">__自动补全__</span><br><span class="line">	+ 输入 Git 命令的时候可以敲两次跳格键（Tab）例如：`$ git co&lt;tab&gt;&lt;tab&gt;`将输出`commit config`</span><br><span class="line">* __Git 命令别名__</span><br><span class="line">	+ 例如：</span><br></pre></td></tr></table></figure>
 <p>$ git config –global alias.co checkout<br>$ git config –global alias.br branch<br>$ git config –global alias.ci commit<br>$ git config –global alias.st status<br>```<br>如果要输入 git commit 只需键入 git ci 即可</p>
 </li>
 </ul>
@@ -186,7 +186,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/03/31/README/" data-id="cimge6tlb0001zwqfkg92q500" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2016/03/31/README/" data-id="cimge8zu00000h4qf6wqz92bo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git-操作指南/">git 操作指南</a></li></ul>
@@ -224,7 +224,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/03/31/first-page/" data-id="cimge6tlb0000zwqfhp4teq4t" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2016/03/31/first-page/" data-id="cimge8zu00001h4qfxbzh3nn1" class="article-share-link">Share</a>
       
       
     </footer>
@@ -244,7 +244,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/git-操作指南/">git 操作指南</a></li></ul>
     </div>
@@ -254,7 +254,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
       <a href="/tags/git-操作指南/" style="font-size: 10px;">git 操作指南</a>
     </div>
@@ -273,7 +273,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -298,7 +298,7 @@
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2016 John Doe<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
