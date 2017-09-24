@@ -17,7 +17,7 @@
 <!--<![endif]-->
 
 <head>
-  <title>Archives: 2017 | 学志の博客</title>
+  <title>浅谈webpack(一) | 学志の博客</title>
   <!-- Meta data -->
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -59,7 +59,7 @@
 </head>
 
 <!--
-<body class="home-template">
+<body class="post-template">
 -->
 <body id="index" class="lightnav animsition">
 
@@ -123,78 +123,84 @@
         <!-- ============================ Header & Logo bar =========================== -->
 
 
-      <!-- ============================ Hero Image =========================== -->
-
-<section id="hero" class="scrollme">
-    <div class="container-fluid element-img" style="background: url(/img/bg_img.jpg) no-repeat center center fixed;background-size: cover">
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 vertical-align cover boost text-center">
-                <div class="center-me animateme" data-when="exit" data-from="0" data-to="0.6" data-opacity="0" data-translatey="100">
-                    <div>
-                        
-                        <h2>YOU'VE MADE A <span>BRAVE</span> DECISION, WELCOME.</h2>
-                        <p></p>
-                        
-                        <h2></h2>
-                        <p>每一个不曾起舞的日子都是对生命的辜负。</p>
-                        
-
-                    </div>
-                </div>
-            </div>
-            <!-- // .col-md-12 -->
-        </div>
-        <div class="herofade beige-dk"></div>
-    </div>
-</section>
-
-<!-- Height spacing helper -->
-<div class="heightblock"></div>
-<!-- // End height spacing helper -->
-
-<!-- ============================ END Hero Image =========================== -->
-
-
-
-
-<section id="services">
+      
+<section id="intro">
     <div class="container">
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <div class="row boxes">
-                    
-                    
-                        
-                        
-                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                            
-                              <h4 class="title"><a href="/2017/09/24/浅谈webpack-一/">浅谈webpack(一)</a></h4>
-                            
-                            <p><time datetime="2017-09-24T02:36:39.000Z"><a href="/2017/09/24/浅谈webpack-一/">2017-09-24</a></time></p>
-                        </div>
-                    
-                        
-                        
-                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                            
-                              <h4 class="title"><a href="/2017/09/21/hello-world/">Hello World</a></h4>
-                            
-                            <p><time datetime="2017-09-21T10:24:26.000Z"><a href="/2017/09/21/hello-world/">2017-09-21</a></time></p>
-                        </div>
-                    
-                </div>
-            </div>    
+        <div class="row col-md-offset-2">
+            <div class="col-md-8">
+    			<span class="post-meta">
+      <time datetime="2017-09-24T02:36:39.000Z" itemprop="datePublished">
+          2017-09-24
+      </time>
+    
+    
+    | 
+    <a href='/tags/webpack/'>webpack</a>
+    
+    
+</span>
+                <h1>浅谈webpack(一)</h1>
+            </div>
         </div>
-    </div>
-</section> 
+        <div class="col-md-8 col-md-offset-2">
+      		<p>webpack作为包管理器,已经推出很多年了。在学习webpack之前,其实需要搞明白为什么要使用它,毕竟打包工具也有很多,比如:gulp,grunt,browserify,fis。</p>
+<p>##为什么使用webpack?<br>换句话说,webpack的特色是什么,有什么值得我们使用的:</p>
+<ul>
+<li>根据文件(模块)之间的依赖关系,拆分成块,并按需进行异步加载。</li>
+<li>强大的Loaders功能,将一切资源转化合适的格式,以共环境使用。  <a id="more"></a></li>
+<li>将一切资源视为块,进行打包转换,比如:传统的js模块(amd,cmd等),图片,less等。</li>
+<li>丰富并具有扩展性的插件功能。</li>
+</ul>
+<p>webpack和gulp的优势在哪?gulp主要是对文件的编译,压缩等功能,简化前端开发流程。webpack侧重在梳理模块之间的关系,将文件进行拆分,然后重新组合生成新的单个或多个文件,并利用加载器和插件进行<br>编译,压缩功能。</p>
+<h2 id="webpack之Entry"><a href="#webpack之Entry" class="headerlink" title="webpack之Entry"></a>webpack之Entry</h2><h5 id="最简单配置-单入口"><a href="#最简单配置-单入口" class="headerlink" title="最简单配置,单入口:"></a>最简单配置,单入口:</h5> <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">module.exports =&#123;</div><div class="line">     entry: <span class="string">'./src/index.js'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 上面的等同于:<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">module.exports =&#123;</div><div class="line">     entry: &#123;</div><div class="line">       main:<span class="string">'./src/index.js'</span></div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里的index.js文件就是入口文件,导入到名称为main的chunk里面。如果需要将多个依赖导入到一个chunk里面,可以给entry中直接传入数组或者对象的值为数组。</p>
+<h4 id="分离公共库"><a href="#分离公共库" class="headerlink" title="分离公共库"></a>分离公共库</h4><p>将公共库从应用程序中分离出来。<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">module.exports =&#123;</div><div class="line">     entry: &#123;</div><div class="line">       main:<span class="string">'./src/index.js'</span>,</div><div class="line">       vendors:[<span class="string">'react'</span>, <span class="string">'react-dom'</span>]</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p> 使用CommonsChunkPlugin插件,将main依赖vendors部分提取到vendors的bundle中,通过<strong>webpack_require</strong>()调用。<br> 提示:对象的key可以为目录形式。</p>
+<h2 id="webpack之Output"><a href="#webpack之Output" class="headerlink" title="webpack之Output"></a>webpack之Output</h2><p> 输出配置:<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">output: &#123;</div><div class="line">   path: path.resolve(__dirname, <span class="string">'./dist'</span>),</div><div class="line">   publicPath: <span class="string">'/dist/'</span>,</div><div class="line">   filename: <span class="string">'build.js'</span></div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="path"><a href="#path" class="headerlink" title="path"></a>path</h4><p> 文件输出路径,资源存储路径。</p>
+<h4 id="publicPath"><a href="#publicPath" class="headerlink" title="publicPath"></a>publicPath</h4><p> 处理静态资源引用地址,比如:css,html等。<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">background: url(../images/yeoman.png);</div></pre></td></tr></table></figure></p>
+<p>  输出:<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">background: url(/dist/42092f929161dae9c08a21bfb46ece4d.png);</div></pre></td></tr></table></figure></p>
+<h4 id="filename"><a href="#filename" class="headerlink" title="filename"></a>filename</h4><p> 文件输出名称<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">filename: <span class="string">'[name].[hash].js'</span> //或</div><div class="line">filename: <span class="string">'[name].[chunkhash].js'</span></div></pre></td></tr></table></figure></p>
+<p>  name：chunk的Name。<br>  id：chunk的Id。<br>  hash：compilation生命周期的hash替换。<br>  chunkhash”被chunk的hash替换。</p>
+<h4 id="chunkFilename"><a href="#chunkFilename" class="headerlink" title="chunkFilename"></a>chunkFilename</h4><p>  非入口的chunk文件名称（非entry配置中文件）</p>
+<p>  待续。。。</p>
 
-<section id="statement">
-    <div class="container text-center wow fadeInUp" data-wow-delay="0.5s">
-        <div class="row">
-            <p>虽然还没想好写点什么，但是总觉得这里放句话比较和谐。</p>
+            <div class="clearfix"></div>
+            <hr class="nogutter">
         </div>
+        <nav class="pagination" role="pagination">
+    
+    
+    <a class="pull-right" href="/2017/09/21/hello-world/">
+        Hello World →
+    </a>
+    
+</nav>
+
+        <div class="duoshuo">
+
+
+
+<div class="ds-thread" data-thread-key="2017/09/24/浅谈webpack-一/" data-title="浅谈webpack(一)" data-url="http://yoursite.com/2017/09/24/浅谈webpack-一/"></div>
+<script type="text/javascript">
+	var duoshuoQuery = {short_name:"qzhongyou"};
+	window.addEventListener('load', function(){
+		(function() {
+			var ds = document.createElement('script');
+			ds.type = 'text/javascript';ds.async = true;
+			ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+			ds.charset = 'UTF-8';
+			(document.getElementsByTagName('head')[0]
+			|| document.getElementsByTagName('body')[0]).appendChild(ds);
+		})();
+	});
+</script>
+</div>
     </div>
 </section>
+
+
       
 <!-- ============================ Footer =========================== -->
 
