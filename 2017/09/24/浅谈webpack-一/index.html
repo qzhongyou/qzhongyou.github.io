@@ -17,7 +17,7 @@
 <!--<![endif]-->
 
 <head>
-  <title>浅谈webpack(一) | 学志の博客</title>
+  <title>浅谈webpack2(一) | 学志の博客</title>
   <!-- Meta data -->
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -139,7 +139,7 @@
     
     
 </span>
-                <h1>浅谈webpack(一)</h1>
+                <h1>浅谈webpack2(一)</h1>
             </div>
         </div>
         <div class="col-md-8 col-md-offset-2">
@@ -164,7 +164,27 @@
 <h4 id="filename"><a href="#filename" class="headerlink" title="filename"></a>filename</h4><p> 文件输出名称<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">filename: <span class="string">'[name].[hash].js'</span> //或</div><div class="line">filename: <span class="string">'[name].[chunkhash].js'</span></div></pre></td></tr></table></figure></p>
 <p>  name：chunk的Name。<br>  id：chunk的Id。<br>  hash：compilation生命周期的hash替换。<br>  chunkhash”被chunk的hash替换。</p>
 <h4 id="chunkFilename"><a href="#chunkFilename" class="headerlink" title="chunkFilename"></a>chunkFilename</h4><p>  非入口的chunk文件名称（非entry配置中文件）</p>
-<p>  待续。。。</p>
+<h4 id="sourceMapFilename"><a href="#sourceMapFilename" class="headerlink" title="sourceMapFilename"></a>sourceMapFilename</h4><p>  sourceMap文件的名称。<br>  参数: <code>[id]</code>,<code>[file]</code>,<code>[hash]</code><br>  默认: <code>[file].map</code></p>
+<h4 id="jsonpFunction"><a href="#jsonpFunction" class="headerlink" title="jsonpFunction"></a>jsonpFunction</h4><p>  异步加载chunk的JSONP函数。<br>  默认:<code>webpackJsonp</code> </p>
+<p>  了解更多<a href="https://webpack.js.org/configuration/output/" target="_blank" rel="external">官网output</a></p>
+<p>  ##webpack之Module</p>
+<h4 id="noParse"><a href="#noParse" class="headerlink" title="noParse"></a>noParse</h4><p>  确认模块中没有其他依赖的情况下,设置<code>noParse</code>,webpack不会解析对应文件,并不会去寻找文件中的依赖。<br>  缩短了打包时间。<br>  参数:<code>/jquery/</code>或<code>[/jquery/]</code></p>
+<h4 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h4><p>  定义解析规则,按照规则,模块将有各自的创建方式。</p>
+<p>  事例:<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">  rules:[&#123;</div><div class="line">      <span class="built_in">test</span>:/\.js$/</div><div class="line">      use:&#123;</div><div class="line">          loader:<span class="string">'babel-loader'</span>,</div><div class="line">          options:&#123;</div><div class="line">              <span class="string">"presets"</span>: [<span class="string">'es2015'</span>,<span class="string">'react'</span>]</div><div class="line">              &#125;</div><div class="line">          &#125;,</div><div class="line">      exclude:[path.join(APP_PATH, <span class="string">'lib'</span>)],</div><div class="line">  &#125;]</div><div class="line">``` </div><div class="line"></div><div class="line">每个rule分为三部分:条件,结果,嵌套规则。听到这里大脑里晕乎乎的,下面将解释这些内容。</div><div class="line"><span class="comment">##### rule条件</span></div><div class="line">当满足所有匹配条件的文件,才会被rule解析。条件的入参有2种类型:</div><div class="line">1. 请求的资源的绝对路径,名称:resource</div><div class="line">2. 发起请求的资源绝对路径 , 名称:issuer</div><div class="line"></div><div class="line">举个栗子:  </div><div class="line">&amp;nbsp;&amp;nbsp;a.js 文件中import <span class="string">"./a.css"</span>。　　</div><div class="line">&amp;nbsp;&amp;nbsp;那么,a.js的绝对路径就是issuer;</div><div class="line">&amp;nbsp;&amp;nbsp;a.css的绝对路径就是resource;</div><div class="line"></div><div class="line">其中,<span class="built_in">test</span>,include,exclude和resource对resource匹配,属性issuer对issuer匹配。</div><div class="line"></div><div class="line"><span class="comment">##### rule结果</span></div><div class="line">条件满足后,rule结果才会执行。  </div><div class="line">还是有点晕,对吧。好比,<span class="keyword">if</span>语句外面的是条件,括号里面的是执行内容,这里的rule结果就像是执行内容。</div><div class="line">rule结果也有2种类型:</div><div class="line">1. 加载器loader:将resource类型资源文件进行转换。(使用过webpack的都比较熟悉loader)</div><div class="line">2. 解析器parser:解析器配置选项。(后面会详细解释)</div><div class="line"></div><div class="line"><span class="comment">#####rule嵌套 </span></div><div class="line">需要满足条件才能起作用。</div><div class="line">通过rule.oneOf和rules配置。</div><div class="line"></div><div class="line">官网代码:</div></pre></td></tr></table></figure></p>
+<p>  {<br>    test: /.css$/,<br>    oneOf: [<br>      {<br>        resourceQuery: /inline/, // foo.css?inline<br>        use: ‘url-loader’<br>      },<br>      {<br>        resourceQuery: /external/, // foo.css?external<br>        use: ‘file-loader’<br>      }<br>    ]<br>  }<br>  foo.css?inline将被url-loader执行,同理。<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#####rule部分参数</div><div class="line">* test:判断条件,resource类型。</div><div class="line">* exclude:排除resource类型文件目录。</div><div class="line">* include:包含的resource类型文件目录。</div><div class="line">* loader:``Rule.use:[&#123;loader&#125;]``的简写。如:`loader:&apos;style-loader!css-loader&apos;`,不建议使用。</div><div class="line">* options:``Rule.use:[&#123;options&#125;]``的简写。如:`options:&#123;key:vlaue&#125;`。</div><div class="line">* use:包含loader属性,可选属性options。loader属性中配置需要使用的加载器,options为加载器参数。例子:</div><div class="line">  ```hash</div><div class="line">  &#123; test:/.less$/,</div><div class="line">    use:[</div><div class="line">      &apos;style-loader&apos;,</div><div class="line">       [loader:&apos;css-loader&apos;,</div><div class="line">       option:&#123;</div><div class="line">           &apos;importLoaders&apos;:1</div><div class="line">       &#125;],</div><div class="line">      &apos;less-loader&apos;</div><div class="line">     ]</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>resourceQuery:资源匹配参数。如:<code>foo.css?inline</code>。</li>
+<li><p>enforce:用于替代webpack中 preLoaders和postLoaders。设置loader的种类。值为:’pre’或’post’。例子: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;    </div><div class="line">  test: /\.(js|jsx)$/,</div><div class="line">  loader: &apos;eslint-loader&apos;,</div><div class="line">  enforce:pre</div><div class="line">&#125;</div><div class="line">//代替preLoaders</div></pre></td></tr></table></figure>
+<p>loader种类分为4种:后置, 行内, 普通, 前置。执行顺序如名称,一目了然。行内是在require或import中使用的loader,例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">require(&quot;!my-loader!./my-module&quot;) 禁止preloaders生效。</div><div class="line">require(&quot;!!my-loader!./my-module&quot;) 禁止在配置文件中的所有加载器生效。</div><div class="line">require(&quot;-!my-loader!./my-module&quot;) 禁止loader和preloader，不禁止postloader。</div></pre></td></tr></table></figure>
+</li>
+<li><p>parser:解析选项对象。对解析器插件进行设置。大部分设置为布尔类型的值,少部分可以是其他。官网例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">parser: &#123;</div><div class="line">  amd: false, // 禁用 AMD</div><div class="line">  commonjs: false, // 禁用 CommonJS</div><div class="line">  system: false, // 禁用 SystemJS</div><div class="line">  harmony: false, // 禁用 ES2015 Harmony import/export</div><div class="line">  requireInclude: false, // 禁用 require.include</div><div class="line">  requireEnsure: false, // 禁用 require.ensure</div><div class="line">  requireContext: false, // 禁用 require.context</div><div class="line">  browserify: false, // 禁用特殊处理的 browserify bundle</div><div class="line">  requireJs: false, // 禁用 requirejs.*</div><div class="line">  node: false, // 禁用 __dirname, __filename, module, require.extensions, require.main 等。</div><div class="line">  node: &#123;...&#125; // 在模块级别(module level)上重新配置 node 层(layer)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>光是例子,大家似乎还是不太明白。实际操作:入口文件app.js中输入<code>console.log(__dirname)</code>,然后执行打包,编译生成文件中生成了一个理解<br>执行函数<code>function(module, __dirname)</code>,第二个参数为<code>__dirname</code>。当在配置文件中设置<code>parser:{node:false}</code>之后,编译后生成文件<br>中,没有这个执行函数。说到这里,大家都懂了吧。</p>
+<p>待续。。。</p>
+</li>
+</ul>
 
             <div class="clearfix"></div>
             <hr class="nogutter">
@@ -182,7 +202,7 @@
 
 
 
-<div class="ds-thread" data-thread-key="2017/09/24/浅谈webpack-一/" data-title="浅谈webpack(一)" data-url="http://yoursite.com/2017/09/24/浅谈webpack-一/"></div>
+<div class="ds-thread" data-thread-key="2017/09/24/浅谈webpack-一/" data-title="浅谈webpack2(一)" data-url="http://yoursite.com/2017/09/24/浅谈webpack-一/"></div>
 <script type="text/javascript">
 	var duoshuoQuery = {short_name:"qzhongyou"};
 	window.addEventListener('load', function(){
