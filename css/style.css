@@ -223,12 +223,12 @@ blockquote footer {
 
 ::selection {
     color: #ffffff;
-    background: #151515;
+    background: #4dd6da;
 }
 
 ::-moz-selection {
     color: #ffffff;
-    background: #151515;
+    background: #4dd6da;
 }
 
 a, button,
