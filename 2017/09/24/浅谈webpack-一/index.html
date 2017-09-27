@@ -188,27 +188,43 @@
 <h4 id="rule嵌套"><a href="#rule嵌套" class="headerlink" title="rule嵌套"></a>rule嵌套</h4><p>  需要满足条件才能起作用。<br>  通过rule.oneOf和rules配置。</p>
 <p>  官网代码:<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  test: /.css$/,</div><div class="line">  oneOf: [</div><div class="line">    &#123;</div><div class="line">      resourceQuery: /inline/, // foo.css?inline</div><div class="line">      use: &apos;url-loader&apos;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      resourceQuery: /external/, // foo.css?external</div><div class="line">      use: &apos;file-loader&apos;</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line">foo.css?inline将被url-loader执行,同理。</div></pre></td></tr></table></figure></p>
 <h4 id="rule部分参数"><a href="#rule部分参数" class="headerlink" title="rule部分参数"></a>rule部分参数</h4><ul>
-<li>test:判断条件,resource类型。</li>
-<li>exclude:排除resource类型文件目录。</li>
-<li>include:包含的resource类型文件目录。</li>
-<li>loader:<code>Rule.use:[{loader}]</code>的简写。如:<code>loader:&#39;style-loader!css-loader&#39;</code>,不建议使用。</li>
-<li>options:<code>Rule.use:[{options}]</code>的简写。如:<code>options:{key:vlaue}</code>。</li>
-<li><p>use:包含loader属性,可选属性options。loader属性中配置需要使用的加载器,options为加载器参数。例子:</p>
+<li><font color="#b38989">test:</font>判断条件,resource类型。</li>
+<li><font color="#b38989">exclude:</font>排除resource类型文件目录。</li>
+<li><font color="#b38989">include:</font>包含的resource类型文件目录。</li>
+<li><font color="#b38989">loader:</font><code>Rule.use:[{loader}]</code>的简写。如:<code>loader:&#39;style-loader!css-loader&#39;</code>,不建议使用。</li>
+<li><font color="#b38989">options:</font><code>Rule.use:[{options}]</code>的简写。如:<code>options:{key:vlaue}</code>。</li>
+<li><p><font color="#b38989">use:</font>包含loader属性,可选属性options。loader属性中配置需要使用的加载器,options为加载器参数。例子:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123; test:/.less$/,</div><div class="line">  use:[</div><div class="line">    &apos;style-loader&apos;,</div><div class="line">     [loader:&apos;css-loader&apos;,</div><div class="line">     option:&#123;</div><div class="line">         &apos;importLoaders&apos;:1</div><div class="line">     &#125;],</div><div class="line">    &apos;less-loader&apos;</div><div class="line">   ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
-<li><p>resourceQuery:资源匹配参数。如:<code>foo.css?inline</code>。</p>
+<li><p><font color="#b38989">resourceQuery:</font>资源匹配参数。如:<code>foo.css?inline</code>。</p>
 </li>
-<li><p>enforce:用于替代webpack中 preLoaders和postLoaders。设置loader的种类。值为:’pre’或’post’。例子: </p>
+<li><p><font color="#b38989">enforce:</font>用于替代webpack中 preLoaders和postLoaders。设置loader的种类。值为:’pre’或’post’。例子: </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;    </div><div class="line">  test: /\.(js|jsx)$/,</div><div class="line">  loader: &apos;eslint-loader&apos;,</div><div class="line">  enforce:pre</div><div class="line">&#125;</div><div class="line">//代替preLoaders</div></pre></td></tr></table></figure>
 <p>loader种类分为4种:后置, 行内, 普通, 前置。执行顺序如名称,一目了然。行内是在require或import中使用的loader,例子:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">require(&quot;!my-loader!./my-module&quot;) 禁止preloaders生效。</div><div class="line">require(&quot;!!my-loader!./my-module&quot;) 禁止在配置文件中的所有加载器生效。</div><div class="line">require(&quot;-!my-loader!./my-module&quot;) 禁止loader和preloader，不禁止postloader。</div></pre></td></tr></table></figure>
 </li>
-<li><p>parser:解析选项对象。对解析器插件进行设置。大部分设置为布尔类型的值,少部分可以是其他。官网例子:</p>
+<li><p><font color="#b38989">parser:</font>解析选项对象。对解析器插件进行设置。大部分设置为布尔类型的值,少部分可以是其他。官网例子:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">parser: &#123;</div><div class="line">  amd: false, // 禁用 AMD</div><div class="line">  commonjs: false, // 禁用 CommonJS</div><div class="line">  system: false, // 禁用 SystemJS</div><div class="line">  harmony: false, // 禁用 ES2015 Harmony import/export</div><div class="line">  requireInclude: false, // 禁用 require.include</div><div class="line">  requireEnsure: false, // 禁用 require.ensure</div><div class="line">  requireContext: false, // 禁用 require.context</div><div class="line">  browserify: false, // 禁用特殊处理的 browserify bundle</div><div class="line">  requireJs: false, // 禁用 requirejs.*</div><div class="line">  node: false, // 禁用 __dirname, __filename, module, require.extensions, require.main 等。</div><div class="line">  node: &#123;...&#125; // 在模块级别(module level)上重新配置 node 层(layer)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>光是例子,大家似乎还是不太明白。实际操作:入口文件app.js中输入<code>console.log(__dirname)</code>,然后执行打包,编译生成文件中生成了一个理解<br>执行函数<code>function(module, __dirname)</code>,第二个参数为<code>__dirname</code>。当在配置文件中设置<code>parser:{node:false}</code>之后,编译后生成文件<br>中,没有这个执行函数。说到这里,大家都懂了吧。</p>
-<p>待续。。。</p>
+<h2 id="webpack之Resolve"><a href="#webpack之Resolve" class="headerlink" title="webpack之Resolve"></a>webpack之Resolve</h2><p>设置模块的解析方式。</p>
+<h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4></li>
+<li><p><font color="#b38989">alias:</font>设置模块别名 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123;newName : path/xxx/xxx &#125; //newName是别名 require(&apos;newName&apos;) eq require(&apos;path/fileName&apos;)</div><div class="line">&#123;newName$ : path/xxx/xxx &#125; //精准匹配 不能 require(&apos;newName/path/file&apos;);</div></pre></td></tr></table></figure>
+</li>
+<li><p><font color="#b38989">modules:</font>解析的模块名称,解析根据配置,具有先后顺序。 <code>{modules:[path.join(__dirname,&quot;./src&quot;),&#39;node_modules&#39;]}</code></p>
+</li>
+<li><font color="#b38989">extensions:</font>扩展名称设置,设置后自动解析,无需在添加 <code>{extensions:[&#39;.js&#39;,&#39;.jsx&#39;]}</code></li>
+<li><font color="#b38989">enforceExtension:</font>强制禁止或允许省略扩展名,布尔类型</li>
+<li><p><font color="#b38989">descriptionFiles:</font>设置解析时,对应引用模块(import React from ‘react’)的描述文件,模块将<font color="red">根据描述文件导入</font>。默认:<code>descriptionFiles:[&#39;package.json&#39;]</code>例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">入口文件中:import React from &apos;react&apos;; //文件中只有这行引用,因为修改描述文件将影响所有模块</div><div class="line">配置:`descriptionFiles:[&apos;package1.json&apos;]`//运行将会报错: Can&apos;t resolve &apos;react&apos; in &apos;/User.....&apos;</div><div class="line">修改 react 模块中的package.json为package1.json ,再次运行,执行成功。</div><div class="line">所以,一般这个属性不会修改。</div></pre></td></tr></table></figure>
+</li>
+<li><p><font color="#b38989">mainFields:</font>设置使用引入模块的package.json文件中哪个属性,来<font color="red">进行导入模块</font>。例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">配置:`mainFields:[&apos;newmain&apos;]` //执行入口文件。报错:Can&apos;t resolve &apos;react&apos; in &apos;/User.....&apos;</div><div class="line"></div><div class="line">修改react的package.json中新增 newmain:&quot;react.js&quot;</div><div class="line">再次运行,执行成功。</div></pre></td></tr></table></figure>
+</li>
+<li><p><font color="#b38989">mainFiles:</font>解析目录时默认的文件名。默认:<code>mainFiles: [&quot;index&quot;]</code>。例如:<br><code>import &#39;components/path/&#39;</code> eq <code>import &#39;components/path/index&#39;</code><br>当设置<code>mainFiles: [&quot;main&quot;]</code>时,<code>import &#39;components/path/&#39;</code>eq<code>import &#39;components/path/main&#39;</code> </p>
 </li>
 </ul>
+<p>  待续。。。</p>
 
             <div class="clearfix"></div>
             <hr class="nogutter">
