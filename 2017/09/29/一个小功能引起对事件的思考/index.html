@@ -153,7 +153,12 @@
 <p>这时候,发现body不在滚动了,但是div也不能滚动了。这个方案似乎也陷入了困境。对代码进行改进。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;</div><div class="line">    var scrollTo = null;</div><div class="line">    if (e.type == &apos;mousewheel&apos;) &#123;</div><div class="line">        //jq对原生event进行了封装,e.originalEvent等于原生event</div><div class="line">        scrollTo = (e.originalEvent.wheelDelta * -1); </div><div class="line">    &#125;</div><div class="line">    else if (e.type == &apos;DOMMouseScroll&apos;) &#123;</div><div class="line">        scrollTo = 40 * e.originalEvent.detail;</div><div class="line">    &#125;</div><div class="line">    if (scrollTo) &#123;</div><div class="line">        e.preventDefault();</div><div class="line">        $(this).scrollTop(scrollTo + $(this).scrollTop());</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
 <p> 这时候需求得到了解决。</p>
-<h2 id="滚轮滚动事件基础"><a href="#滚轮滚动事件基础" class="headerlink" title="滚轮滚动事件基础"></a>滚轮滚动事件基础</h2>
+<h2 id="滚轮滚动事件基础"><a href="#滚轮滚动事件基础" class="headerlink" title="滚轮滚动事件基础"></a>滚轮滚动事件基础</h2><ol>
+<li>mousewheel和DOMMouseScroll只是滚轮滚动的时候触发和scroll是不相同的。</li>
+<li>FireFox使用的DOMMouseScroll事件,其他浏览器使用的mousewheel事件,为了兼容一般同时使用。</li>
+<li>FireFox中没有wheelDelta属性,使用的是detail,每次向下滚动一次detail的值为120,而wheelDelta的值为-3。</li>
+</ol>
+
             <div class="clearfix"></div>
             <hr class="nogutter">
         </div>
