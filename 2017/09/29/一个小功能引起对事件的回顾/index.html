@@ -91,13 +91,13 @@
 <meta property="og:site_name" content="学志の博客">
 <meta property="og:description" content="学无止境、温故知新  故事是这样的 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://thumbnail0.baidupcs.com/thumbnail/2a661d4941bf7d4bb37f676d9ac19a4c?fid=1127266147-250528-79394019215670&time=1507273200&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XPJlLwneLMB0r9bVhgbnE7VuvZY%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=6462801136681450839&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video">
+<meta property="og:image" content="http://oxfr9vqx2.bkt.clouddn.com/asd.gif">
 <meta property="og:image" content="http://yoursite.com/img/1005354-20161222125521823-1914047378.png">
-<meta property="og:updated_time" content="2017-10-07T03:48:51.000Z">
+<meta property="og:updated_time" content="2017-10-07T04:30:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一个小功能引起对事件的回顾">
 <meta name="twitter:description" content="学无止境、温故知新  故事是这样的 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。">
-<meta name="twitter:image" content="https://thumbnail0.baidupcs.com/thumbnail/2a661d4941bf7d4bb37f676d9ac19a4c?fid=1127266147-250528-79394019215670&time=1507273200&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XPJlLwneLMB0r9bVhgbnE7VuvZY%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=6462801136681450839&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video">
+<meta name="twitter:image" content="http://oxfr9vqx2.bkt.clouddn.com/asd.gif">
 
 
 
@@ -310,7 +310,7 @@
         <blockquote>
 <p>学无止境、温故知新</p>
 </blockquote>
-<h2 id="故事是这样的"><a href="#故事是这样的" class="headerlink" title="故事是这样的"></a>故事是这样的</h2><p> 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。<a id="more"></a><br> <img src="https://thumbnail0.baidupcs.com/thumbnail/2a661d4941bf7d4bb37f676d9ac19a4c?fid=1127266147-250528-79394019215670&time=1507273200&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-XPJlLwneLMB0r9bVhgbnE7VuvZY%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=6462801136681450839&dp-callid=0&size=c710_u400&quality=100&vuk=-&ft=video" width="200"><br> 图一</p>
+<h2 id="故事是这样的"><a href="#故事是这样的" class="headerlink" title="故事是这样的"></a>故事是这样的</h2><p> 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。<a id="more"></a><br> <img src="http://oxfr9vqx2.bkt.clouddn.com/asd.gif" width="200"><br> 图一</p>
 <p> 先想想自己怎么实现。</p>
 <h2 id="解决方案（一）"><a href="#解决方案（一）" class="headerlink" title="解决方案（一）"></a>解决方案（一）</h2><p> 当body或者html脱离文档流，页面自然不会滚动。div内部却可以滚动。直接上代码:</p>
  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;div id=&quot;good&quot;&gt;&lt;/div&gt;</div><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;// DOMMouseScroll 兼容火狐</div><div class="line">     $(&quot;body&quot;).css(&#123;position: &apos;fixed&apos;&#125;);  // 设置fixed脱离文档流</div><div class="line">&#125;</div></pre></td></tr></table></figure>
