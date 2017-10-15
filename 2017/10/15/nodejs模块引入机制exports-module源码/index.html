@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="nodejs," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一段报错信息  我们可以通过下面的一段报错信息,了解nodejs整个执行过程。我将根据整个执行过程,来进行源码的讲解,为源码添加大量注释来达到直观效果。 12345678at Module._compile (module.js:569:30)   at Object.Module._extensions..js (module.js:580:10)   at Module.load (modul">
+<meta name="keywords" content="nodejs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nodejs模块引入机制exports&amp;module源码">
+<meta property="og:url" content="http://yoursite.com/2017/10/15/nodejs模块引入机制exports-module源码/index.html">
+<meta property="og:site_name" content="玉面の博客">
+<meta property="og:description" content="一段报错信息  我们可以通过下面的一段报错信息,了解nodejs整个执行过程。我将根据整个执行过程,来进行源码的讲解,为源码添加大量注释来达到直观效果。 12345678at Module._compile (module.js:569:30)   at Object.Module._extensions..js (module.js:580:10)   at Module.load (modul">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-10-15T07:39:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nodejs模块引入机制exports&amp;module源码">
+<meta name="twitter:description" content="一段报错信息  我们可以通过下面的一段报错信息,了解nodejs整个执行过程。我将根据整个执行过程,来进行源码的讲解,为源码添加大量注释来达到直观效果。 12345678at Module._compile (module.js:569:30)   at Object.Module._extensions..js (module.js:580:10)   at Module.load (modul">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/15/nodejs模块引入机制exports-module源码/"/>
+
+
+
+
+
+  <title>nodejs模块引入机制exports&module源码 | 玉面の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?116e113bff4b2eb23f55755a5a3eba56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">玉面の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/15/nodejs模块引入机制exports-module源码/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qzhongyou">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="玉面の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">nodejs模块引入机制exports&module源码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-15T10:58:36+08:00">
+                2017-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/10/15/nodejs模块引入机制exports-module源码/" class="leancloud_visitors" data-flag-title="nodejs模块引入机制exports&module源码">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一段报错信息"><a href="#一段报错信息" class="headerlink" title="一段报错信息"></a>一段报错信息</h2><p>  我们可以通过下面的一段报错信息,了解nodejs整个执行过程。我将根据整个执行过程,来进行源码的讲解,为源码添加大量注释来达到直观效果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">at Module._compile (module.js:569:30)</div><div class="line">   at Object.Module._extensions..js (module.js:580:10)</div><div class="line">   at Module.load (module.js:503:32)</div><div class="line">   at tryModuleLoad (module.js:466:12)</div><div class="line">   at Function.Module._load (module.js:458:3)</div><div class="line">   at Function.Module.runMain (module.js:605:10)</div><div class="line">   at startup (bootstrap_node.js:158:16)</div><div class="line">   at bootstrap_node.js:575:3</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="bootstrap-node载入Module"><a href="#bootstrap-node载入Module" class="headerlink" title="bootstrap_node载入Module"></a>bootstrap_node载入Module</h2><p>  bootstrap_node(<a href="https://github.com/nodejs/node/blob/master/lib/internal/bootstrap_node.js" target="_blank" rel="external">bootstrap_node源码</a>)<br>  文件是nodejs第一个js执行文件,通过node.cc文件执行。<br>  startup函数通过如下源码,去加载module模块:<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//加载module模块,原生模块都通过NativeModule的require加载</div><div class="line">const Module = NativeModule.require(&apos;module&apos;);</div><div class="line">....</div><div class="line">//加载主文件,也就是你们的入口文件</div><div class="line">Module.runMain();</div></pre></td></tr></table></figure></p>
+<h2 id="NativeModule"><a href="#NativeModule" class="headerlink" title="NativeModule"></a>NativeModule</h2><p>  NativeModule是加载,生成原生模块实例,编译,执行原生模块的函数,源码在bootstrap_node文件中,源码如下:<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div></pre></td><td class="code"><pre><div class="line"> function NativeModule(id) &#123;</div><div class="line">     this.filename = `$&#123;id&#125;.js`;</div><div class="line">     this.id = id;</div><div class="line">     this.exports = &#123;&#125;;</div><div class="line">     this.loaded = false;</div><div class="line">     this.loading = false;</div><div class="line">   &#125;</div><div class="line">  </div><div class="line">   NativeModule._source = process.binding(&apos;natives&apos;);</div><div class="line">   NativeModule._cache = &#123;&#125;;</div><div class="line"> </div><div class="line">   const config = process.binding(&apos;config&apos;);</div><div class="line"> </div><div class="line">   NativeModule.require = function(id) &#123;</div><div class="line">     //如果是native_module,直接返回</div><div class="line">     if (id === &apos;native_module&apos;) &#123;</div><div class="line">       return NativeModule;</div><div class="line">     &#125;</div><div class="line">     //如果有缓存,并且编译过或正在编译,直接返回</div><div class="line">     const cached = NativeModule.getCached(id);</div><div class="line">     if (cached &amp;&amp; (cached.loaded || cached.loading)) &#123;</div><div class="line">       return cached.exports;</div><div class="line">     &#125;</div><div class="line">     //如果不存在这个原生模块,直接报错</div><div class="line">     if (!NativeModule.exists(id)) &#123;</div><div class="line">       const err = new Error(`No such built-in module: $&#123;id&#125;`);</div><div class="line">       err.code = &apos;ERR_UNKNOWN_BUILTIN_MODULE&apos;;</div><div class="line">       err.name = &apos;Error [ERR_UNKNOWN_BUILTIN_MODULE]&apos;;</div><div class="line">       throw err;</div><div class="line">     &#125;</div><div class="line">     //将原生模块push到moduleLoadList数组中</div><div class="line">     process.moduleLoadList.push(`NativeModule $&#123;id&#125;`);</div><div class="line">     //创建一个原生模块</div><div class="line">     const nativeModule = new NativeModule(id);</div><div class="line">     //将模块添加到缓存中</div><div class="line">     nativeModule.cache();</div><div class="line">     //执行编译,关键代码</div><div class="line">     nativeModule.compile();</div><div class="line">     //返回nativeModule.exports</div><div class="line">     //nativeModule.exports的赋值在模块文件中完成。</div><div class="line">     return nativeModule.exports;</div><div class="line">   &#125;;</div><div class="line">   </div><div class="line"> //获取缓存</div><div class="line"> NativeModule.getCached = function(id) &#123;</div><div class="line">   return NativeModule._cache[id];</div><div class="line"> &#125;;</div><div class="line">//原生模块是否纯在</div><div class="line"> NativeModule.exists = function(id) &#123;</div><div class="line">   return NativeModule._source.hasOwnProperty(id);</div><div class="line"> &#125;;</div><div class="line"> //获取模块内容信息</div><div class="line"> NativeModule.getSource = function(id) &#123;</div><div class="line">   return NativeModule._source[id];</div><div class="line"> &#125;;</div><div class="line"> //将模块的内容包裹一层函数</div><div class="line"> //Module.js文件源码中:</div><div class="line"> //Module.wrapper = NativeModule.wrapper;</div><div class="line"> //Module.wrap = NativeModule.wrap;</div><div class="line"> //所以除了NativeModule,Module也具有wrapper,wrap函数</div><div class="line"> //这就是为什么我们可以在文件中直接使用exports,require,__filename的原因</div><div class="line"> </div><div class="line"> NativeModule.wrap = function(script) &#123;</div><div class="line">   return NativeModule.wrapper[0] + script + NativeModule.wrapper[1];</div><div class="line"> &#125;;</div><div class="line"> //包裹的函数 </div><div class="line"> NativeModule.wrapper = [</div><div class="line">   &apos;(function (exports, require, module, __filename, __dirname) &#123; &apos;,</div><div class="line">   &apos;\n&#125;);&apos;</div><div class="line"> ];</div><div class="line"> //编译</div><div class="line"> NativeModule.prototype.compile = function() &#123;</div><div class="line">   //获取原生模块中代码</div><div class="line">   var source = NativeModule.getSource(this.id);</div><div class="line">   //进行处理</div><div class="line">   source = NativeModule.wrap(source);</div><div class="line">   this.loading = true;</div><div class="line"></div><div class="line">   try &#123;</div><div class="line">       //runInThisContext vm虚拟机知识,可以去了解vm</div><div class="line">       //创建独立的沙箱运行空间,执行source字符串,fn变量为执行后返回的内容</div><div class="line">     const fn = runInThisContext(source, &#123;</div><div class="line">       filename: this.filename,</div><div class="line">       lineOffset: 0,</div><div class="line">       displayErrors: true</div><div class="line">     &#125;);</div><div class="line">     //将模块文件中使用的变量,进行传入。</div><div class="line">     //所以模块文件中的exports为module.exports的引用。</div><div class="line">     //require为 NativeModule.require (只是原生模块,其他模块这里不一样)。</div><div class="line">     fn(this.exports, NativeModule.require, this, this.filename);</div><div class="line">     //编译完成</div><div class="line">     this.loaded = true;</div><div class="line">   &#125; finally &#123;</div><div class="line">     this.loading = false;</div><div class="line">   &#125;</div><div class="line"> &#125;;</div><div class="line">  //缓存</div><div class="line"> NativeModule.prototype.cache = function() &#123;</div><div class="line">   NativeModule._cache[this.id] = this;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure></p>
+<p>  通过上面源码可以看出<code>const Module = NativeModule.require(&#39;module&#39;)</code>,Module其实是新创建的原生模块实例的exports属性返回值。<br>  而module.js文件中代码可以使用这个新创建的原生模块实例所有属性。</p>
+<h2 id="Module源码"><a href="#Module源码" class="headerlink" title="Module源码"></a>Module源码</h2><p>  根据代码的调用顺序进行,源代码的解析:</p>
+<h4 id="runMain"><a href="#runMain" class="headerlink" title="runMain"></a>runMain</h4><p>   bootstrap_node文件中执行<code>Module.runMain()</code>,<a href="https://github.com/nodejs/node/blob/master/lib/module.js" target="_blank" rel="external">Module模块</a>runMain源码如下:<br>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Module.runMain = function() &#123;</div><div class="line">  //process.argv[1]命令中第二个参数,一般为入口文件名称</div><div class="line">  Module._load(process.argv[1], null, true);</div><div class="line">  process._tickCallback();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="load"><a href="#load" class="headerlink" title="_load"></a>_load</h4><p>   runMain执行了_load这个函数,_load源码:<br>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line">//request:入口文件</div><div class="line">//parent:导入了当前模块的模块,也就是说当前使用require的文件模块的实例化。</div><div class="line">//isMain:是否为主文件</div><div class="line">Module._load = function(request, parent, isMain) &#123;</div><div class="line">     if (parent) &#123;</div><div class="line">       debug(&apos;Module._load REQUEST %s parent: %s&apos;, request, parent.id);</div><div class="line">     &#125;</div><div class="line">   </div><div class="line">     var filename = null;</div><div class="line">     //为主函数</div><div class="line">     if (isMain) &#123;</div><div class="line">       try &#123;</div><div class="line">         //获取文件名称,module.js文件中的代码太多,只展示主要的。</div><div class="line">         filename = Module._resolveFilename(request, parent, isMain);</div><div class="line">       &#125; catch (e) &#123;</div><div class="line">         // try to keep stack</div><div class="line">         e.stack;</div><div class="line">         throw e;</div><div class="line">       &#125;</div><div class="line">       //experimentalModules实验性模块</div><div class="line">       //比如:使用 ES Module时,`import xxx form `xxxx`。需要标识为experimentalModules。(nodejs 8.5)</div><div class="line">       if (experimentalModules) &#123;</div><div class="line">         (async () =&gt; &#123;</div><div class="line">           // loader setup</div><div class="line">           if (!ESMLoader) &#123;</div><div class="line">             ESMLoader = new Loader();</div><div class="line">             const userLoader = process.binding(&apos;config&apos;).userLoader;</div><div class="line">             if (userLoader) &#123;</div><div class="line">               const hooks = await new Loader().import(userLoader);</div><div class="line">               ESMLoader.hook(hooks);</div><div class="line">             &#125;</div><div class="line">           &#125;</div><div class="line">           await ESMLoader.import(getURLFromFilePath(filename).href);</div><div class="line">         &#125;)()</div><div class="line">         .catch((e) =&gt; &#123;</div><div class="line">           console.error(e);</div><div class="line">           process.exit(1);</div><div class="line">         &#125;);</div><div class="line">         return;</div><div class="line">       &#125;</div><div class="line">     &#125; else &#123;</div><div class="line">        //获取文件名称</div><div class="line">       filename = Module._resolveFilename(request, parent, isMain);</div><div class="line">     &#125;</div><div class="line">     //如果缓存中已经具有当前模块就返回模块</div><div class="line">     var cachedModule = Module._cache[filename];</div><div class="line">     if (cachedModule) &#123;</div><div class="line">       //因为其他文件也许引入了该模块,所以缓存中具有改模块,但是当前引入该模块的父亲模块的parent.children中,并不一定具有该模块。</div><div class="line">       //所以更新parent.children, 将当前模块加入带parent.children中</div><div class="line">       updateChildren(parent, cachedModule, true);</div><div class="line">       //返回模块的exports</div><div class="line">       return cachedModule.exports;</div><div class="line">     &#125;</div><div class="line">    //如果模块为原生模块,需要使用NativeModule的require来加载</div><div class="line">     if (NativeModule.nonInternalExists(filename)) &#123;</div><div class="line">       debug(&apos;load native module %s&apos;, request);</div><div class="line">       return NativeModule.require(filename);</div><div class="line">     &#125;</div><div class="line">     //创建个模块实例</div><div class="line">     // Don&apos;t call updateChildren(), Module constructor already does.</div><div class="line">     var module = new Module(filename, parent);</div><div class="line">     //主模块</div><div class="line">     if (isMain) &#123;</div><div class="line">       process.mainModule = module;</div><div class="line">       module.id = &apos;.&apos;;</div><div class="line">     &#125;</div><div class="line">     //添加缓存</div><div class="line">     Module._cache[filename] = module;</div><div class="line">     </div><div class="line">     //执行tryModuleLoad</div><div class="line">     tryModuleLoad(module, filename);</div><div class="line">     //返回exports</div><div class="line">     return module.exports;</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="load-1"><a href="#load-1" class="headerlink" title="load"></a>load</h4><p>   tryModuleLoad函数源码:</p>
+   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">function tryModuleLoad(module, filename) &#123;</div><div class="line">  var threw = true;</div><div class="line">  try &#123;</div><div class="line">  //执行 load</div><div class="line">    module.load(filename);</div><div class="line">    threw = false;</div><div class="line">  &#125; finally &#123;</div><div class="line">     //如果报错,删除缓存</div><div class="line">    if (threw) &#123;</div><div class="line">      delete Module._cache[filename];</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>   load函数源码:<br>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">Module.prototype.load = function(filename) &#123;</div><div class="line">  debug(&apos;load %j for module %j&apos;, filename, this.id);</div><div class="line">  //确定当前模块未被加载</div><div class="line">  assert(!this.loaded);</div><div class="line">  this.filename = filename;</div><div class="line">  //文件路径</div><div class="line">  this.paths = Module._nodeModulePaths(path.dirname(filename));</div><div class="line">  //文件后缀</div><div class="line">  var extension = path.extname(filename) || &apos;.js&apos;;</div><div class="line">  //如果没有当前函数,extension设置为.js</div><div class="line">  if (!Module._extensions[extension]) extension = &apos;.js&apos;;</div><div class="line">  //执行函数,下面有源码</div><div class="line">  Module._extensions[extension](this, filename);</div><div class="line">  //加载完成</div><div class="line">  this.loaded = true;</div><div class="line"></div><div class="line">  if (ESMLoader) &#123;</div><div class="line">    const url = getURLFromFilePath(filename);</div><div class="line">    const urlString = `$&#123;url&#125;`;</div><div class="line">    if (ESMLoader.moduleMap.has(urlString) !== true) &#123;</div><div class="line">      const ctx = createDynamicModule([&apos;default&apos;], url);</div><div class="line">      ctx.reflect.exports.default.set(this.exports);</div><div class="line">      ESMLoader.moduleMap.set(urlString,</div><div class="line">                              new ModuleJob(ESMLoader, url, async () =&gt; ctx));</div><div class="line">    &#125; else &#123;</div><div class="line">      const job =  ESMLoader.moduleMap.get(urlString);</div><div class="line">      if (job.reflect)</div><div class="line">        job.reflect.exports.default.set(this.exports);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<h4 id="Module-extensions"><a href="#Module-extensions" class="headerlink" title="Module._extensions"></a>Module._extensions</h4>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">Module._extensions[&apos;.js&apos;] = function(module, filename) &#123;</div><div class="line">  //后缀为.js 读取文件内容</div><div class="line">  var content = fs.readFileSync(filename, &apos;utf8&apos;);</div><div class="line">  //编译 (stripBOM对带BOM头的内容进行处理,这是编码方面知识)</div><div class="line">  module._compile(internalModule.stripBOM(content), filename);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line">// Native extension for .json</div><div class="line">//后缀为.json,处理</div><div class="line">Module._extensions[&apos;.json&apos;] = function(module, filename) &#123;</div><div class="line">  var content = fs.readFileSync(filename, &apos;utf8&apos;);</div><div class="line">  try &#123;</div><div class="line">    module.exports = JSON.parse(internalModule.stripBOM(content));</div><div class="line">  &#125; catch (err) &#123;</div><div class="line">    err.message = filename + &apos;: &apos; + err.message;</div><div class="line">    throw err;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line">//Native extension for .node</div><div class="line">Module._extensions[&apos;.node&apos;] = function(module, filename) &#123;</div><div class="line">  return process.dlopen(module, path.toNamespacedPath(filename));</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//实验性模块处理</div><div class="line">//比如:nodejs 8.5 支持 ES Module,需修改文件扩展名应为mjs,并标识experimentalModules</div><div class="line"></div><div class="line">if (experimentalModules) &#123;</div><div class="line">  Module._extensions[&apos;.mjs&apos;] = function(module, filename) &#123;</div><div class="line">    throw new errors.Error(&apos;ERR_REQUIRE_ESM&apos;, filename);</div><div class="line">  &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="compile"><a href="#compile" class="headerlink" title="_compile"></a>_compile</h4>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line">Module.prototype._compile = function(content, filename) &#123;</div><div class="line"> </div><div class="line">  content = internalModule.stripShebang(content);</div><div class="line"></div><div class="line">  // create wrapper function</div><div class="line">  //Module.wrap等于 NativeModule.wrap 之前的注释里面也有</div><div class="line">  var wrapper = Module.wrap(content);</div><div class="line">  //创建独立的沙箱运行空间,并执行wrapper</div><div class="line">  //vm.runInThisContext中的wrapper可以直接使用global,这就是为什么我们可以直接使用global的原因</div><div class="line">  var compiledWrapper = vm.runInThisContext(wrapper, &#123;</div><div class="line">    filename: filename,</div><div class="line">    lineOffset: 0,</div><div class="line">    displayErrors: true</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  var inspectorWrapper = null;</div><div class="line">  if (process._breakFirstLine &amp;&amp; process._eval == null) &#123;</div><div class="line">    if (!resolvedArgv) &#123;</div><div class="line">      // we enter the repl if we&apos;re not given a filename argument.</div><div class="line">      if (process.argv[1]) &#123;</div><div class="line">        resolvedArgv = Module._resolveFilename(process.argv[1], null, false);</div><div class="line">      &#125; else &#123;</div><div class="line">        resolvedArgv = &apos;repl&apos;;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // Set breakpoint on module start</div><div class="line">    if (filename === resolvedArgv) &#123;</div><div class="line">      delete process._breakFirstLine;</div><div class="line">      inspectorWrapper = process.binding(&apos;inspector&apos;).callAndPauseOnStart;</div><div class="line">      if (!inspectorWrapper) &#123;</div><div class="line">        const Debug = vm.runInDebugContext(&apos;Debug&apos;);</div><div class="line">        Debug.setBreakPoint(compiledWrapper, 0, 0);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  var dirname = path.dirname(filename);</div><div class="line">  var require = internalModule.makeRequireFunction(this);</div><div class="line">  var depth = internalModule.requireDepth;</div><div class="line">  if (depth === 0) stat.cache = new Map();</div><div class="line">  var result;</div><div class="line">  if (inspectorWrapper) &#123;</div><div class="line">    result = inspectorWrapper(compiledWrapper, this.exports, this.exports,</div><div class="line">                              require, this, filename, dirname);</div><div class="line">  &#125; else &#123;</div><div class="line">     //将this.exports作为运行函数的作用域,将新建模块的属性作为参数传</div><div class="line">     //这就是为什么,模块中this等于module.exports的原因</div><div class="line">    result = compiledWrapper.call(this.exports, this.exports, require, this,</div><div class="line">                                  filename, dirname);</div><div class="line">  &#125;</div><div class="line">  if (depth === 0) stat.cache = null;</div><div class="line">  return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  上面的代码,我们看见了一个模块的加载和执行过程,并了解了我们能直接使用exports,require,module,__dirname等等的原因。<br>  还有this指代module.exports的原因,下面将解释我们最常用的<code>require</code>的源码。</p>
+<h4 id="require"><a href="#require" class="headerlink" title="require"></a>require</h4>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Module.prototype.require = function(path) &#123;</div><div class="line">  //路径不能为空</div><div class="line">  assert(path, &apos;missing path&apos;);</div><div class="line">  //路径为字符串</div><div class="line">  assert(typeof path === &apos;string&apos;, &apos;path must be a string&apos;);</div><div class="line">  //执行_load</div><div class="line">  return Module._load(path, this, /* isMain */ false);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  我们看见require的代码就短短几句话,最后返回Module._load的执行结果。而通过上面的代码解释,我们知道Module._load返回的是<br>  我们引入的模块的实例化对象的exports属性。如果还不明白可以看下面例子。</p>
+<h4 id="例子讲解"><a href="#例子讲解" class="headerlink" title="例子讲解"></a>例子讲解</h4><p>  例如:<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//入口文件 index.js:</div><div class="line">var add = require(&apos;./add.js&apos;);</div><div class="line">console.log(add(1,2));</div><div class="line">//add.js</div><div class="line">module.exports = function(a,b)&#123;return a+b&#125;;</div><div class="line">//执行node index.js</div></pre></td></tr></table></figure></p>
+<p>  简单的来说,那么程序会执行。</p>
+<ol>
+<li>bootstrap_node的startup函数,加载Module模块。然后执行Module.runMain。</li>
+<li>Module.runMain会加载并执行主文件index.js。</li>
+<li>主文件执行<code>require</code>这里的require其实就是主文件实例化后的module.require。</li>
+<li>然后,加载并执行add.js,生成新的模块实例,执行并为add.js模块实例的属性exports赋值。</li>
+<li>最终,将新的模块的exports属性,即module.exports,返回给add这个变量。</li>
+<li>所以add变量的值,其实就为<code>function(a,b){return a+b}</code>这个函数。</li>
+</ol>
+<p> 参考<br> <a href="https://github.com/nodejs/node" target="_blank" rel="external">node源码</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nodejs/" rel="tag"># nodejs</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/06/跨域请求方法/" rel="next" title="跨域请求方法">
+                <i class="fa fa-chevron-left"></i> 跨域请求方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qzhongyou</p>
+              <p class="site-description motion-element" itemprop="description">每一个不曾起舞的日子都是对生命的辜负。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:15123396560@163.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一段报错信息"><span class="nav-number">1.</span> <span class="nav-text">一段报错信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bootstrap-node载入Module"><span class="nav-number">2.</span> <span class="nav-text">bootstrap_node载入Module</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NativeModule"><span class="nav-number">3.</span> <span class="nav-text">NativeModule</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Module源码"><span class="nav-number">4.</span> <span class="nav-text">Module源码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#runMain"><span class="nav-number">4.0.1.</span> <span class="nav-text">runMain</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#load"><span class="nav-number">4.0.2.</span> <span class="nav-text">_load</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#load-1"><span class="nav-number">4.0.3.</span> <span class="nav-text">load</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Module-extensions"><span class="nav-number">4.0.4.</span> <span class="nav-text">Module._extensions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#compile"><span class="nav-number">4.0.5.</span> <span class="nav-text">_compile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#require"><span class="nav-number">4.0.6.</span> <span class="nav-text">require</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#例子讲解"><span class="nav-number">4.0.7.</span> <span class="nav-text">例子讲解</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qzhongyou</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fastclick/1.0.6/fastclick.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.lazyload/1.9.3/jquery.lazyload.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.ui.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jOdEy4y7BN40cYaD8YrNXhHO-gzGzoHsz", "Qx4YEwm7hbVlee0nUX64TgzK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
