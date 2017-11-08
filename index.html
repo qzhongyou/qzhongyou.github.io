@@ -135,6 +135,16 @@
 
 
 
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?116e113bff4b2eb23f55755a5a3eba56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
 
 
 
@@ -317,32 +327,18 @@
 
       
         
-          
-            <p>  上周写了一篇关于<a href="qzhongyou.github.io/2017/10/15/nodejs模块引入机制exports-module源码/">require和module</a>的文章,其中runMain函数中有一段代码这样的代码<code>process._tickCallback();</code>,不知道你们还记得不。这个代码其实和process.nextick有关系。</p>
+          <p>  上周写了一篇关于<a href="qzhongyou.github.io/2017/10/15/nodejs模块引入机制exports-module源码/">require和module</a>的文章,其中runMain函数中有一段代码这样的代码<code>process._tickCallback();</code>,不知道你们还记得不。这个代码其实和process.nextick有关系。</p>
 <h2 id="基础认知-Macrotask-amp-Microtask"><a href="#基础认知-Macrotask-amp-Microtask" class="headerlink" title="基础认知  Macrotask &amp; Microtask"></a>基础认知  Macrotask &amp; Microtask</h2><p>  这里描述的知识点长话短说。<br>  nodejs事件循环中,其实具有2种任务队列:Macrotask和Microtask。每次事件循环只会执行一个Macrotask队列中的任务,然后将Microtask队列中的所有任务执行完成。周而复始,直到结束。</p>
 <ul>
 <li>Macrotask: setTimeout, setInterval, setImmediate, I/O, UI rendering</li>
-<li>Microtask: process.nextTick, Promises, Object.observe, MutationObserver</li>
-</ul>
-<p>  每一次事件循环都会按照:timers -&gt;poll(I/O)-&gt;check(immediates)这样的顺序遍历。</p>
-<ul>
-<li>timers阶段会执行所有达到延时的回调。</li>
-<li>poll阶段执行所有获取数据的IO回调。</li>
-<li>check阶段只执行一个最先设置的immediate回调。</li>
-<li>timers阶段若设置了I/O任务,并且在poll阶段前数据就已经返回,该I/O回调将会在该次event loop的poll阶段执行</li>
-<li>timers和poll阶段若设置了immediates的回调,并且此回调是最先设置的回调,则该回调会在该次event loop的check阶段执行。</li>
-</ul>
-<p>例子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">setImmediate(function () &#123;</div><div class="line">    console.log(1);</div><div class="line">&#125;, 0);</div><div class="line"></div><div class="line">setTimeout(function () &#123;</div><div class="line">    console.log(2);</div><div class="line">    process.nextTick(function () &#123;</div><div class="line">        console.log(3);</div><div class="line">    &#125;);</div><div class="line">&#125;, 0);</div><div class="line">//结果:2,3,1 其实也有可能是1,2,3  后面会解释</div></pre></td></tr></table></figure></p>
-<p>根据现在这个结果,可以看出Microtask类型的nextTick确实比Macrotask类型的setImmediate要先执行。</p>
-<h2 id="上面的结论真对吗"><a href="#上面的结论真对吗" class="headerlink" title="上面的结论真对吗"></a>上面的结论真对吗</h2><h3 id="setImmediate-vs-setTimeout-谁先执行"><a href="#setImmediate-vs-setTimeout-谁先执行" class="headerlink" title="setImmediate vs setTimeout 谁先执行"></a>setImmediate vs setTimeout 谁先执行</h3><p>上面的例子执行多次后,会发现setImmediate有时会比setTimeout先执行。原因是什么,timers不是应该在check immediate之前遍历执行吗。其实,就算setTimeout设置的是0毫秒,当轮询在timers阶段,是会去判断timer设置的延时是否已经到达,如果到达才会执行。只要轮询足够快,在timer的延迟到达之前执行timers阶段,就不会执行settimeout,所以自然就会出现,setImmediate在setTimeout之前执行的情况。官方文档是这样说的<a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#setimmediate-vs-settimeout" target="_blank" rel="external">setImmediate vs setTimeout</a>,虽然只是简单的说了受性能的限制。</p>
-<h3 id="process-nextTick-vs-Promises-then-谁先执行"><a href="#process-nextTick-vs-Promises-then-谁先执行" class="headerlink" title="process.nextTick vs Promises.then 谁先执行"></a>process.nextTick vs Promises.then 谁先执行</h3><p>其实process.nextTick是一直会在Promises之前执行的,为什么呢?我们先看下<code>process._tickCallback();</code>源码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">function _tickCallback() &#123;</div><div class="line">   do &#123;</div><div class="line">     while (tickInfo[kIndex] &lt; tickInfo[kLength]) &#123;</div><div class="line">       ++tickInfo[kIndex];</div><div class="line">       const tock = nextTickQueue.shift();</div><div class="line">       const callback = tock.callback;</div><div class="line">       const args = tock.args;</div><div class="line">       emitBefore(tock[async_id_symbol], tock[trigger_async_id_symbol]);</div><div class="line">       if (async_hook_fields[kDestroy] &gt; 0)</div><div class="line">         emitDestroy(tock[async_id_symbol]);</div><div class="line">       _combinedTickCallback(args, callback);</div><div class="line"></div><div class="line">       emitAfter(tock[async_id_symbol]);</div><div class="line">       if (kMaxCallbacksPerLoop &lt; tickInfo[kIndex])</div><div class="line">         tickDone();</div><div class="line">     &#125;</div><div class="line">     tickDone();</div><div class="line">     _runMicrotasks();</div><div class="line">     emitPendingUnhandledRejections();</div><div class="line">   &#125; while (tickInfo[kLength] !== 0);</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-<p>可以看出,所有的nextTick被存储在nextTickQueue队列中。每次循环取出一个tick,通过_combinedTickCallback函数执行nextTick。最后再执行_runMicrotasks函数(包括Promises的执行)。所以,process.nextTick永远优先于Promises执行。</p>
-<h3 id="Macrotask-amp-Microtask-到底谁先执行"><a href="#Macrotask-amp-Microtask-到底谁先执行" class="headerlink" title="Macrotask &amp; Microtask 到底谁先执行"></a>Macrotask &amp; Microtask 到底谁先执行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">setTimeout(function()&#123;</div><div class="line">   console.log(1);</div><div class="line">&#125;,0);</div><div class="line">Promise.resolve().then(function () &#123;</div><div class="line">    console.log(2);</div><div class="line">&#125;)</div><div class="line">process.nextTick(function () &#123;</div><div class="line">    console.log(3);</div><div class="line">&#125;)</div><div class="line">结果:2,3,1</div></pre></td></tr></table></figure>
-<p>前面说过Macrotask比Microtask先执行,为什么这里Promise和nextTick比setTimeout先执行?其实,官方文档里面这里说的,可以将主进程作为一个Macrotask。但是,在源码<code>Module._load(process.argv[1], null, true);process._tickCallback();</code>里面可以看见,主进程执行最后执行了_tickCallback,触发了Microtask队列里的任务。如果上面这段代码在I/O里面执行,那遵循事件循环遍历顺序,就能找到原因。</p>
-<h3 id="性能问题"><a href="#性能问题" class="headerlink" title="性能问题"></a>性能问题</h3><p>Microtask队列太长,造成Macrotask较长时间无法执行,最终引起I/O问题。通过上面<code>_tickCallback</code>方法的源码,我们知道nextTick设置了个最大值<code>const kMaxCallbacksPerLoop = 1e4;</code>,考虑了性能方面问题。</p>
-<p>参考:<br><a href="https://github.com/nodejs/node/blob/master/lib/internal/process/next_tick.js" target="_blank" rel="external">next_tick源码</a></p>
-
-          
+<li><p>Microtask: process.nextTick, Promises, Object.observe, MutationObserver</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/10/22/nodejs事件循环/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
