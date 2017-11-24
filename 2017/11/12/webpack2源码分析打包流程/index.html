@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="webpack2,源码分析," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言在写浅谈webpack2–学会配置(一)的时候,就想把plugins单独拿出来说。但是webpack使用了tapable来实现插件对事件订阅执行,使得插件和webpack打包流程密不可分,所以这篇文章就不得不提webpack的整个打包流程。  tapablewebpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提">
+<meta name="keywords" content="webpack2,源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack2源码分析打包流程(二)">
+<meta property="og:url" content="http://yoursite.com/2017/11/12/webpack2源码分析打包流程/index.html">
+<meta property="og:site_name" content="玉面の博客">
+<meta property="og:description" content="前言在写浅谈webpack2–学会配置(一)的时候,就想把plugins单独拿出来说。但是webpack使用了tapable来实现插件对事件订阅执行,使得插件和webpack打包流程密不可分,所以这篇文章就不得不提webpack的整个打包流程。  tapablewebpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://oxfr9vqx2.bkt.clouddn.com/TB1GVGFNXXXXXaTapXXXXXXXXXX-4436-4244.jpg">
+<meta property="og:updated_time" content="2017-11-24T09:43:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack2源码分析打包流程(二)">
+<meta name="twitter:description" content="前言在写浅谈webpack2–学会配置(一)的时候,就想把plugins单独拿出来说。但是webpack使用了tapable来实现插件对事件订阅执行,使得插件和webpack打包流程密不可分,所以这篇文章就不得不提webpack的整个打包流程。  tapablewebpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提">
+<meta name="twitter:image" content="http://oxfr9vqx2.bkt.clouddn.com/TB1GVGFNXXXXXaTapXXXXXXXXXX-4436-4244.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/12/webpack2源码分析打包流程/"/>
+
+
+
+
+
+  <title>webpack2源码分析打包流程(二) | 玉面の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?116e113bff4b2eb23f55755a5a3eba56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">玉面の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/12/webpack2源码分析打包流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qzhongyou">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="玉面の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">webpack2源码分析打包流程(二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-12T17:15:59+08:00">
+                2017-11-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/11/12/webpack2源码分析打包流程/" class="leancloud_visitors" data-flag-title="webpack2源码分析打包流程(二)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在写<a href="http://qzhongyou.github.io/2017/09/24/%E6%B5%85%E8%B0%88webpack-%E4%B8%80/" target="_blank" rel="external">浅谈webpack2–学会配置(一)</a><br>的时候,就想把plugins单独拿出来说。但是webpack使用了tapable来实现插件对事件订阅执行,使得插件和webpack打包流程密不可分,所以这篇文章<br>就不得不提webpack的整个打包流程。 </p>
+<h2 id="tapable"><a href="#tapable" class="headerlink" title="tapable"></a>tapable</h2><p>webpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,<a href="https://github.com/webpack/tapable" target="_blank" rel="external">tapable</a>刚好提供了这么一个解决方案。<br>(tapable详细使用,自行查阅资料)</p>
+<h4 id="tapable事件流程控制事例"><a href="#tapable事件流程控制事例" class="headerlink" title="tapable事件流程控制事例"></a>tapable事件流程控制事例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">const tapable = require(&apos;tapable&apos;);</div><div class="line">const Tapable = new tapable();</div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(null,500);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(null,200);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(null,&apos;end&apos;);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.applyPluginsAsyncWaterfall(&apos;name&apos;, 1000, function (err,result) &#123;</div><div class="line">  console.log(&quot;end&quot;,err,result)</div><div class="line">&#125;);</div><div class="line">/*执行结果</div><div class="line"> 1000</div><div class="line"> 500</div><div class="line"> 200</div><div class="line"> end null end</div><div class="line"> */</div></pre></td></tr></table></figure>
+<p>执行结果遵循先入先出原则,当前事件的处理函数执行<code>cb()</code>后才会执行下一个处理函数。注:<code>applyPluginsAsyncWaterfall</code>中,<br>前一个处理函数执行<code>cb(null,value)</code>传入的第二个参数<code>value</code>作为下一个执行函数的传入参数值。</p>
+<h4 id="tapable错误处理事例"><a href="#tapable错误处理事例" class="headerlink" title="tapable错误处理事例"></a>tapable错误处理事例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">const tapable = require(&apos;tapable&apos;);</div><div class="line">const Tapable = new tapable();</div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(null,500);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(new Error(&apos;test error&apos;));</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(&apos;name&apos;, function (value, cb) &#123;</div><div class="line">  setTimeout(function () &#123;</div><div class="line">    console.log(value);cb(null,&apos;end&apos;);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.applyPluginsAsyncWaterfall(&apos;name&apos;, 1000, function (err,result) &#123;</div><div class="line">  console.log(&quot;end&quot;,err,result)</div><div class="line">&#125;);</div><div class="line">/*执行结果</div><div class="line">1000</div><div class="line">500</div><div class="line">end Error: test error</div><div class="line">    at Timeout._onTimeout (/Users/xxx/xxx/src/test.js:24:27)</div><div class="line">    at ontimeout (timers.js:469:11)</div><div class="line">    at tryOnTimeout (timers.js:304:5)</div><div class="line">    at Timer.listOnTimeout (timers.js:264:5) undefined</div><div class="line"> */</div></pre></td></tr></table></figure>
+<p>第二个事件处理函数中抛出了错误<code>cb(new Error(&#39;test error&#39;))</code>时,后面的处理函数将不会被执行,直接结束。<br>执行<code>applyPluginsAsyncWaterfall</code>中的函数。</p>
+<h2 id="webpack概念"><a href="#webpack概念" class="headerlink" title="webpack概念"></a>webpack概念</h2><p>为方便理解整个打包流程,在讲流程之前还需要明白一些概念。</p>
+<h4 id="compiler-和-compilation"><a href="#compiler-和-compilation" class="headerlink" title="compiler 和 compilation"></a>compiler 和 compilation</h4><p>关于compiler,先上一段源码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">//bin/webpack.js 文件</div><div class="line">... //对配置文件和shell中参数进行处理生成options,加载部分插件的工作</div><div class="line">var webpack = require(&quot;../lib/webpack.js&quot;);</div><div class="line">try &#123;   //生成compiler</div><div class="line">		compiler = webpack(options);</div><div class="line"> ...</div><div class="line"> </div><div class="line">//  lib/webpack.js文件</div><div class="line">let compiler;</div><div class="line">    //options是config配置和命令行参数解析后生成的配置信息</div><div class="line">	if(Array.isArray(options)) &#123;</div><div class="line">	    //多个options,生成MultiCompiler对象,包含多个compiler</div><div class="line">		compiler = new MultiCompiler(options.map(options =&gt; webpack(options)));</div><div class="line">	&#125; else if(typeof options === &quot;object&quot;) &#123;</div><div class="line">		new WebpackOptionsDefaulter().process(options);</div><div class="line">		compiler = new Compiler();</div><div class="line">		compiler.context = options.context;</div><div class="line">		//赋值</div><div class="line">		compiler.options = options;</div><div class="line">		new NodeEnvironmentPlugin().apply(compiler);</div><div class="line">		if(options.plugins &amp;&amp; Array.isArray(options.plugins)) &#123;</div><div class="line">		//执行各插件的apply函数,compiler.apply函数继承于Tapable</div><div class="line">			compiler.apply.apply(compiler, options.plugins);</div><div class="line">		&#125;</div><div class="line">		//触发environment,after-environment事件</div><div class="line">		compiler.applyPlugins(&quot;environment&quot;);</div><div class="line">		compiler.applyPlugins(&quot;after-environment&quot;);</div><div class="line">		//WebpackOptionsApply的process函数中根据配置信息对compiler中属性赋值</div><div class="line">		//根据配置信息执行插件,返回新的options</div><div class="line">		compiler.options = new WebpackOptionsApply().process(options, compiler);</div><div class="line">     ....</div><div class="line">     </div><div class="line">//  lib/Compiler.js文件</div><div class="line">function Compiler() &#123;</div><div class="line">    Tapable.call(this);</div><div class="line">    //环境配置信息,lib/webpack.js文件中WebpackOptionsApply的process函数对其赋值</div><div class="line">    this.outputPath = &quot;&quot;;</div><div class="line">    this.outputFileSystem = null;</div><div class="line">    ...</div><div class="line">       &#125;</div><div class="line">    Compiler.prototype.watch = function(watchOptions, handler) &#123;...</div><div class="line">    Compiler.prototype.run = function(callback) &#123;...</div><div class="line">    Compiler.prototype.newCompilation = function(params) &#123;...</div><div class="line">    ....</div></pre></td></tr></table></figure></p>
+<p>我为源码添加了部分注释。我们可以在源码中看出,在options配置信息生成后,compiler对象被webpack生成。<br>compiler继承于Tapable。compiler中包含了options所有配置信息,run函数启动编译和构建过程。compiler生成了<br>compilation对象。</p>
+<p>关于compilation,也先上一段源码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//  lib/Compilation.js文件</div><div class="line">class Compilation extends Tapable &#123;</div><div class="line">	constructor(compiler) &#123;</div><div class="line">		super();</div><div class="line">		this.compiler = compiler;</div><div class="line">		this.resolvers = compiler.resolvers;</div><div class="line">		...</div><div class="line">        this.entries = [];</div><div class="line">		...</div><div class="line">		this.chunks = [];</div><div class="line">		...</div><div class="line">		this.modules = [];	</div><div class="line">		addEntry(context, entry, name, callback)&#123;...</div><div class="line">	    seal(callback) &#123;...</div><div class="line">	    buildModule(module, optional, origin, dependencies, thisCallback) &#123;...</div></pre></td></tr></table></figure></p>
+<p>compilation包含了模块的信息,模块拆分后的chunk信息和最终生成assets信息等。compilation中还包含了对模块生成,构建的函数,对模块和chunk<br>的拆分封装函数,assets生成函数等。源码中也可以看见compiler赋值给了compilation.compiler。compilation更像一个编译过程中产生的资源和<br>编译中各功能点方法的具体实现的集合。</p>
+<h4 id="module"><a href="#module" class="headerlink" title="module"></a>module</h4><ul>
+<li>module是整个过程的最基础的实体。后面seal封装和asset生成流程,都是基于生成构建的module。</li>
+<li>module又包含了NormalModule,MultiModule,ContextModule,DelegatedModule子类。</li>
+<li>NormalModule为单一入口时创建的模块,MultiModule为多入口时创建模块,ContextModule<br>为模块化规范(amd,common,es6等)使用而创建的模块。<h4 id="chunk"><a href="#chunk" class="headerlink" title="chunk"></a>chunk</h4>在seal封装时,对module的具体的拆分处理后,生成的包含module各部分的生成物。</li>
+</ul>
+<h2 id="webpack打包流程"><a href="#webpack打包流程" class="headerlink" title="webpack打包流程"></a>webpack打包流程</h2><h4 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h4><p> 了解tapable之后,我们来看一张webpack流程图,我们将根据这张流程图进行源码分析。<br>  <img src="http://oxfr9vqx2.bkt.clouddn.com/TB1GVGFNXXXXXaTapXXXXXXXXXX-4436-4244.jpg" width="200"><br>  (这张图是来自网络)</p>
+<h4 id="配置和shell解析"><a href="#配置和shell解析" class="headerlink" title="配置和shell解析"></a>配置和shell解析</h4><p> 这个webpack打包流程的第一步。这一步分为2种不一样的情况:</p>
+<ul>
+<li>通过命令执行输入<code>webpack</code>中执行。</li>
+<li><p>通过nodejs中<code>require(&#39;webpack&#39;)</code>执行。<br>第一种情况,程序会执行bin/webpack.js脚本文件。第二种情况,程序会去执行lib/webpack.js文件。(如果不懂为什么的同学,可以去先去了解<br>package.json的配置具体含义。)<br>先看bin/webpack.js脚本源代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">var yargs = require(&quot;yargs&quot;);</div><div class="line">...</div><div class="line">require(&quot;./config-yargs&quot;)(yargs);</div><div class="line">...</div><div class="line">yargs.options(&#123;</div><div class="line">	&quot;json&quot;: &#123;</div><div class="line">...</div><div class="line">var options = require(&quot;./convert-argv&quot;)(yargs, argv);</div></pre></td></tr></table></figure>
+<p>未完继续…</p>
+<h5 id="yargs"><a href="#yargs" class="headerlink" title="yargs"></a>yargs</h5></li>
+</ul>
+<h2 id="自定义plugin"><a href="#自定义plugin" class="headerlink" title="自定义plugin"></a>自定义plugin</h2><font color="#bf2626">注:本文章中的源代码来至我本地的2.7.0版本。O__O “…,所以也许和你看见的不一致。</font>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webpack2/" rel="tag"># webpack2</a>
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/22/nodejs事件循环/" rel="next" title="nodejs事件循环">
+                <i class="fa fa-chevron-left"></i> nodejs事件循环
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qzhongyou</p>
+              <p class="site-description motion-element" itemprop="description">每一个不曾起舞的日子都是对生命的辜负。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:15123396560@163.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tapable"><span class="nav-number">2.</span> <span class="nav-text">tapable</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tapable事件流程控制事例"><span class="nav-number">2.0.1.</span> <span class="nav-text">tapable事件流程控制事例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tapable错误处理事例"><span class="nav-number">2.0.2.</span> <span class="nav-text">tapable错误处理事例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack概念"><span class="nav-number">3.</span> <span class="nav-text">webpack概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#compiler-和-compilation"><span class="nav-number">3.0.1.</span> <span class="nav-text">compiler 和 compilation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#module"><span class="nav-number">3.0.2.</span> <span class="nav-text">module</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chunk"><span class="nav-number">3.0.3.</span> <span class="nav-text">chunk</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack打包流程"><span class="nav-number">4.</span> <span class="nav-text">webpack打包流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#流程图"><span class="nav-number">4.0.1.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置和shell解析"><span class="nav-number">4.0.2.</span> <span class="nav-text">配置和shell解析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#yargs"><span class="nav-number">4.0.2.1.</span> <span class="nav-text">yargs</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义plugin"><span class="nav-number">5.</span> <span class="nav-text">自定义plugin</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qzhongyou</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fastclick/1.0.6/fastclick.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.lazyload/1.9.3/jquery.lazyload.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.ui.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jOdEy4y7BN40cYaD8YrNXhHO-gzGzoHsz", "Qx4YEwm7hbVlee0nUX64TgzK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
