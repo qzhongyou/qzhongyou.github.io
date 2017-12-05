@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tapable事件流程解决方案,webpack的compiler,webpack的compilation,编译器" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言&amp;emsp;&amp;emsp;在写下一篇关于webpack2打包流程的文章之前,需要把webpack2中的一些概念来理一理。这样能提供更好的理解。 tapable&amp;emsp;&amp;emsp;webpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提供了这么一个解决方案。(tapable详细使用,自行查阅资料)  tapabl">
+<meta name="keywords" content="tapable事件流程解决方案,webpack的compiler,webpack的compilation,编译器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack2事件流程控制和核心概念(二)">
+<meta property="og:url" content="http://yoursite.com/2017/11/12/webpack2事件流程控制和概念-二/index.html">
+<meta property="og:site_name" content="玉面の博客">
+<meta property="og:description" content="前言&amp;emsp;&amp;emsp;在写下一篇关于webpack2打包流程的文章之前,需要把webpack2中的一些概念来理一理。这样能提供更好的理解。 tapable&amp;emsp;&amp;emsp;webpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提供了这么一个解决方案。(tapable详细使用,自行查阅资料)  tapabl">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-05T09:13:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack2事件流程控制和核心概念(二)">
+<meta name="twitter:description" content="前言&amp;emsp;&amp;emsp;在写下一篇关于webpack2打包流程的文章之前,需要把webpack2中的一些概念来理一理。这样能提供更好的理解。 tapable&amp;emsp;&amp;emsp;webpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,tapable刚好提供了这么一个解决方案。(tapable详细使用,自行查阅资料)  tapabl">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/12/webpack2事件流程控制和概念-二/"/>
+
+
+
+
+
+  <title>webpack2事件流程控制和核心概念(二) | 玉面の博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?116e113bff4b2eb23f55755a5a3eba56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">玉面の博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/12/webpack2事件流程控制和概念-二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qzhongyou">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="玉面の博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">webpack2事件流程控制和核心概念(二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-12T17:15:59+08:00">
+                2017-11-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/11/12/webpack2事件流程控制和概念-二/" class="leancloud_visitors" data-flag-title="webpack2事件流程控制和核心概念(二)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>&emsp;&emsp;在写下一篇关于webpack2打包流程的文章之前,需要把webpack2中的一些概念来理一理。这样能提供更好的理解。</p>
+<h2 id="tapable"><a href="#tapable" class="headerlink" title="tapable"></a>tapable</h2><p>&emsp;&emsp;webpack的整个流程是通过事件进行控制的。webpack在整个流程中对事件的执行顺序和错误的处理问题是需要考虑的,<a href="https://github.com/webpack/tapable" target="_blank" rel="external">tapable</a>刚好提供了这么一个解决方案。(tapable详细使用,自行查阅资料)</p>
+<ul>
+<li>tapable事件流程控制事例<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> tapable = <span class="built_in">require</span>(<span class="string">'tapable'</span>);</div><div class="line"><span class="keyword">const</span> Tapable = <span class="keyword">new</span> tapable();</div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="literal">null</span>,<span class="number">500</span>);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="literal">null</span>,<span class="number">200</span>);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="literal">null</span>,<span class="string">'end'</span>);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.applyPluginsAsyncWaterfall(<span class="string">'name'</span>, <span class="number">1000</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err,result</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">"end"</span>,err,result)</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">/*执行结果</span></div><div class="line"><span class="comment"> 1000</span></div><div class="line"><span class="comment"> 500</span></div><div class="line"><span class="comment"> 200</span></div><div class="line"><span class="comment"> end null end</span></div><div class="line"><span class="comment"> */</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>&emsp;&emsp;执行结果遵循先入先出原则,当前事件的处理函数执行<code>cb()</code>后才会执行下一个处理函数。注:<code>applyPluginsAsyncWaterfall</code>中,前一个处理函数执行<code>cb(null,value)</code>传入的第二个参数<code>value</code>作为下一个执行函数的传入参数值。<br><a id="more"></a></p>
+<ul>
+<li>tapable错误处理事例<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> tapable = <span class="built_in">require</span>(<span class="string">'tapable'</span>);</div><div class="line"><span class="keyword">const</span> Tapable = <span class="keyword">new</span> tapable();</div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="literal">null</span>,<span class="number">500</span>);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'test error'</span>));</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.plugin(<span class="string">'name'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">value, cb</span>) </span>&#123;</div><div class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(value);cb(<span class="literal">null</span>,<span class="string">'end'</span>);</div><div class="line">  &#125;, value)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">Tapable.applyPluginsAsyncWaterfall(<span class="string">'name'</span>, <span class="number">1000</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err,result</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">"end"</span>,err,result)</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">/*执行结果</span></div><div class="line"><span class="comment">1000</span></div><div class="line"><span class="comment">500</span></div><div class="line"><span class="comment">end Error: test error</span></div><div class="line"><span class="comment">    at Timeout._onTimeout (/Users/xxx/xxx/src/test.js:24:27)</span></div><div class="line"><span class="comment">    at ontimeout (timers.js:469:11)</span></div><div class="line"><span class="comment">    at tryOnTimeout (timers.js:304:5)</span></div><div class="line"><span class="comment">    at Timer.listOnTimeout (timers.js:264:5) undefined</span></div><div class="line"><span class="comment"> */</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>&emsp;&emsp;第二个事件处理函数中抛出了错误<code>cb(new Error(&#39;test error&#39;))</code>时,后面的处理函数将不会被执行,直接结束。执行<code>applyPluginsAsyncWaterfall</code>中的函数。</p>
+<h2 id="webpack概念"><a href="#webpack概念" class="headerlink" title="webpack概念"></a>webpack概念</h2><p>&emsp;&emsp;webpack中有许多的实体,而其中部分核心实体和我们打包过程密不可分。</p>
+<h3 id="compiler-和-compilation"><a href="#compiler-和-compilation" class="headerlink" title="compiler 和 compilation"></a>compiler 和 compilation</h3><p>compiler源码解析:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// bin/webpack.js 文件</span></div><div class="line"></div><div class="line">... <span class="comment">//对配置文件和shell中参数进行处理生成options,加载部分插件的工作</span></div><div class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">"../lib/webpack.js"</span>);</div><div class="line"><span class="keyword">try</span> &#123;   <span class="comment">//生成compiler</span></div><div class="line">	compiler = webpack(options);</div><div class="line"> ...</div><div class="line"> </div><div class="line"><span class="comment">// lib/webpack.js文件</span></div><div class="line"></div><div class="line"><span class="comment">//options是config配置和命令行参数解析后生成的配置信息</span></div><div class="line"><span class="keyword">if</span>(<span class="built_in">Array</span>.isArray(options)) &#123;</div><div class="line"></div><div class="line">    <span class="comment">//多个options,生成MultiCompiler对象,包含多个compiler</span></div><div class="line">	compiler = <span class="keyword">new</span> MultiCompiler(options.map(<span class="function"><span class="params">options</span> =&gt;</span> webpack(options)));</div><div class="line">	</div><div class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">typeof</span> options === <span class="string">"object"</span>) &#123;</div><div class="line">	<span class="keyword">new</span> WebpackOptionsDefaulter().process(options);</div><div class="line">	compiler = <span class="keyword">new</span> Compiler();</div><div class="line">	compiler.context = options.context;</div><div class="line">	<span class="comment">//赋值</span></div><div class="line">	compiler.options = options;</div><div class="line">	<span class="keyword">new</span> NodeEnvironmentPlugin().apply(compiler);</div><div class="line">	<span class="keyword">if</span>(options.plugins &amp;&amp; <span class="built_in">Array</span>.isArray(options.plugins)) &#123;</div><div class="line">	</div><div class="line">	    <span class="comment">//执行各插件的apply函数,compiler.apply函数继承于Tapable</span></div><div class="line">		compiler.apply.apply(compiler, options.plugins);</div><div class="line">	&#125;</div><div class="line">	<span class="comment">//触发environment,after-environment事件</span></div><div class="line">	compiler.applyPlugins(<span class="string">"environment"</span>);</div><div class="line">	compiler.applyPlugins(<span class="string">"after-environment"</span>);</div><div class="line">	</div><div class="line">	<span class="comment">//WebpackOptionsApply的process函数中根据配置信息对compiler中属性赋值</span></div><div class="line">	<span class="comment">//根据配置信息执行插件,返回新的options</span></div><div class="line">	compiler.options = <span class="keyword">new</span> WebpackOptionsApply().process(options, compiler);</div><div class="line">	</div><div class="line">....</div><div class="line">     </div><div class="line"><span class="comment">//  lib/Compiler.js文件</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Compiler</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    Tapable.call(<span class="keyword">this</span>);</div><div class="line">    </div><div class="line">    <span class="comment">//环境配置信息,lib/webpack.js文件中WebpackOptionsApply的process函数对其赋值</span></div><div class="line">    <span class="keyword">this</span>.outputPath = <span class="string">""</span>;</div><div class="line">    <span class="keyword">this</span>.outputFileSystem = <span class="literal">null</span>;</div><div class="line">    ...</div><div class="line">       &#125;</div><div class="line">    Compiler.prototype.watch = <span class="function"><span class="keyword">function</span>(<span class="params">watchOptions, handler</span>) </span>&#123;...</div><div class="line">    Compiler.prototype.run = <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>) </span>&#123;...</div><div class="line">    Compiler.prototype.newCompilation = <span class="function"><span class="keyword">function</span>(<span class="params">params</span>) </span>&#123;...</div><div class="line">    ....</div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;我们可以在源码中看出,在options配置信息生成后,compiler对象被webpack创建。compiler继承于Tapable,包含了所有配置信息。compiler控制着打包的整个流程,包括创建compilation对象,然后执行编译,文件输出等流程。</p>
+<p>compilation源码解析:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compilation</span> <span class="keyword">extends</span> <span class="title">Tapable</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(compiler) &#123;</div><div class="line">    <span class="keyword">super</span>();</div><div class="line">    <span class="keyword">this</span>.compiler = compiler;</div><div class="line">    <span class="keyword">this</span>.resolvers = compiler.resolvers;</div><div class="line">  ...</div><div class="line">    <span class="keyword">this</span>.entries = [];</div><div class="line">  ...</div><div class="line">    <span class="keyword">this</span>.chunks = [];</div><div class="line">  ...</div><div class="line">    <span class="keyword">this</span>.modules = [];</div><div class="line">    addEntry(context, entry, name, callback)&#123;...</div><div class="line">      seal(callback) &#123;...</div><div class="line">        buildModule(<span class="built_in">module</span>, optional, origin, dependencies, thisCallback) &#123;...</div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;compilation也继承于Tapable,被compiler创建。不仅包含了webpack环境配置,模块和compiler等信息,还包含了模块和模块依赖的创建和构建,封装方法。chunk的创建和最终生成assets信息的方法等。每当一个文件发生改变时就会产生一个新的compilation。<br>(关于compilation中的各种方法,在下一篇的打包流程的文章中将被详细讲到。)</p>
+<h3 id="module"><a href="#module" class="headerlink" title="module"></a>module</h3><ul>
+<li>所有的入口文件,文件中的依赖都会被创建为module,module是整个过程最核心,最基础的实体。chunk的封装和asset生成都是基于module。</li>
+<li>module包含了<code>NormalModule</code>,<code>MultiModule</code>,<code>ContextModule</code>,<code>DelegatedModule</code>,<code>ExternalModule</code>等子类。</li>
+<li>NormalModule为单一入口时创建的模块,MultiModule为多入口时创建模块,ContextModule为模块化规范(amd,common,es6等)使用而创建的模块。</li>
+<li>module由<code>NormalModuleFactory</code>,<code>ContextModuleFactory</code>,<code>DllModuleFactory</code>,<code>MultiModuleFactory</code>等工厂模块所创建。</li>
+</ul>
+<h3 id="dependency"><a href="#dependency" class="headerlink" title="dependency"></a>dependency</h3><p>依赖在模块执行loader之后,通过acorn解析生成AST(抽象语法树)之时,被依赖解析插件遍历,最终将依赖加入dependencies数组,其实依赖也是模块。</p>
+<h3 id="chunk"><a href="#chunk" class="headerlink" title="chunk"></a>chunk</h3><p>chunk是由多个module的具体的拆分处理后生成,包含了一个或多个module。比如:异步加载的模块就会被创建生成一个新的chunk,使用CommonsChunkPlugin也会生成新chunk。</p>
+<h3 id="Template"><a href="#Template" class="headerlink" title="Template"></a>Template</h3><p>将不同的chunk通过对应的依赖模板,封装成source,赋值给asset。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webpack2/" rel="tag"># webpack2</a>
+          
+            <a href="/tags/源码分析/" rel="tag"># 源码分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/22/nodejs事件循环/" rel="next" title="nodejs事件循环">
+                <i class="fa fa-chevron-left"></i> nodejs事件循环
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/23/webpack2源码分析打包流程/" rel="prev" title="webpack2源码分析打包流程(三)">
+                webpack2源码分析打包流程(三) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qzhongyou</p>
+              <p class="site-description motion-element" itemprop="description">每一个不曾起舞的日子都是对生命的辜负。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:15123396560@163.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tapable"><span class="nav-number">2.</span> <span class="nav-text">tapable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack概念"><span class="nav-number">3.</span> <span class="nav-text">webpack概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#compiler-和-compilation"><span class="nav-number">3.1.</span> <span class="nav-text">compiler 和 compilation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#module"><span class="nav-number">3.2.</span> <span class="nav-text">module</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dependency"><span class="nav-number">3.3.</span> <span class="nav-text">dependency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chunk"><span class="nav-number">3.4.</span> <span class="nav-text">chunk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Template"><span class="nav-number">3.5.</span> <span class="nav-text">Template</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qzhongyou</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fastclick/1.0.6/fastclick.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.lazyload/1.9.3/jquery.lazyload.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.ui.min.js"></script>
+
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jOdEy4y7BN40cYaD8YrNXhHO-gzGzoHsz", "Qx4YEwm7hbVlee0nUX64TgzK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

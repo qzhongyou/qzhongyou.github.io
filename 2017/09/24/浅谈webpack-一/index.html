@@ -91,7 +91,7 @@
 <meta property="og:site_name" content="玉面の博客">
 <meta property="og:description" content="webpack作为包管理器,已经推出很多年了。在学习webpack之前,其实需要搞明白为什么要使用它,毕竟打包工具也有很多,比如:gulp,grunt,browserify,fis。 为什么使用webpack?换句话说,webpack的特色是什么,有什么值得我们使用的:  根据文件(模块)之间的依赖关系,拆分成块,并按需进行异步加载。 强大的Loaders功能,将一切资源转化合适的格式,以共环境使">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-10-07T03:48:01.000Z">
+<meta property="og:updated_time" content="2017-12-05T07:21:28.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浅谈webpack2--学会配置(一)">
 <meta name="twitter:description" content="webpack作为包管理器,已经推出很多年了。在学习webpack之前,其实需要搞明白为什么要使用它,毕竟打包工具也有很多,比如:gulp,grunt,browserify,fis。 为什么使用webpack?换句话说,webpack的特色是什么,有什么值得我们使用的:  根据文件(模块)之间的依赖关系,拆分成块,并按需进行异步加载。 强大的Loaders功能,将一切资源转化合适的格式,以共环境使">
@@ -347,9 +347,9 @@
 <p>  name：chunk的Name。<br>  id：chunk的Id。<br>  hash：compilation生命周期的hash替换。<br>  chunkhash”被chunk的hash替换。</p>
 <h4 id="chunkFilename"><a href="#chunkFilename" class="headerlink" title="chunkFilename"></a>chunkFilename</h4><p>  非入口的chunk文件名称（非entry配置中文件）</p>
 <h4 id="sourceMapFilename"><a href="#sourceMapFilename" class="headerlink" title="sourceMapFilename"></a>sourceMapFilename</h4><p>  sourceMap文件的名称。<br>  参数: <code>[id]</code>,<code>[file]</code>,<code>[hash]</code><br>  默认: <code>[file].map</code></p>
-<h4 id="jsonpFunction"><a href="#jsonpFunction" class="headerlink" title="jsonpFunction"></a>jsonpFunction</h4><p>  异步加载chunk的JSONP函数。<br>  默认:<code>webpackJsonp</code> </p>
+<h4 id="jsonpFunction"><a href="#jsonpFunction" class="headerlink" title="jsonpFunction"></a>jsonpFunction</h4><p>  异步加载的chunk的JSONP函数。<br>  默认:<code>webpackJsonp</code> </p>
 <p>  了解更多<a href="https://webpack.js.org/configuration/output/" target="_blank" rel="external">官网output</a></p>
-<h2 id="webpack之Module"><a href="#webpack之Module" class="headerlink" title="webpack之Module"></a>webpack之Module</h2><h4 id="noParse"><a href="#noParse" class="headerlink" title="noParse"></a>noParse</h4><p>  确认模块中没有其他依赖的情况下,设置<code>noParse</code>,webpack不会解析对应文件,并不会去寻找文件中的依赖。<br>  缩短了打包时间。<br>  参数:<code>/jquery/</code>或<code>[/jquery/]</code></p>
+<h2 id="webpack之Module"><a href="#webpack之Module" class="headerlink" title="webpack之Module"></a>webpack之Module</h2><h4 id="noParse"><a href="#noParse" class="headerlink" title="noParse"></a>noParse</h4><p>  确认模块中没有其他依赖的情况下,设置<code>noParse</code>,webpack不会解析对应文件生成AST,并不会去寻找文件中的依赖。<br>  缩短了打包时间。<br>  参数:<code>/jquery/</code>或<code>[/jquery/]</code></p>
 <h4 id="rules"><a href="#rules" class="headerlink" title="rules"></a>rules</h4><p>  定义解析规则,按照规则,模块将有各自的创建方式。</p>
 <p>  事例:  </p>
   <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">rules:[&#123;</div><div class="line">    <span class="built_in">test</span>:/\.js$/</div><div class="line">    use:&#123;</div><div class="line">        loader:<span class="string">'babel-loader'</span>,</div><div class="line">        options:&#123;</div><div class="line">            <span class="string">"presets"</span>: [<span class="string">'es2015'</span>,<span class="string">'react'</span>]</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">    exclude:[path.join(APP_PATH, <span class="string">'lib'</span>)],</div><div class="line">&#125;]</div></pre></td></tr></table></figure>
@@ -522,7 +522,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
