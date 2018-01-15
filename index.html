@@ -265,7 +265,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/" itemprop="url">Ascii,Gbk,Unicode,UTF-8,UTF-16 编码详解</a></h1>
+                <a class="post-title-link" href="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/" itemprop="url">Ascii,Gbk,Unicode字符集和UTF-8,UTF-16编码详解</a></h1>
         
 
         <div class="post-meta">
@@ -295,7 +295,7 @@
 
           
           
-             <span id="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/" class="leancloud_visitors" data-flag-title="Ascii,Gbk,Unicode,UTF-8,UTF-16 编码详解">
+             <span id="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/" class="leancloud_visitors" data-flag-title="Ascii,Gbk,Unicode字符集和UTF-8,UTF-16编码详解">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -327,15 +327,19 @@
 
       
         
-          
-            <pre><code>    之前一直使用现有的NPM包对文件上传做处理,上周在了解具体的实现原理中,遇到了编码方面的问题
+          <pre><code>   之前一直使用第三方的NPM包对文件上传做处理,上周在了解具体的实现原理中,遇到了编码方面的问题
 ,然后又去了解了编码。
-</code></pre><h2 id="Ascii-GBK-Unicode-演变"><a href="#Ascii-GBK-Unicode-演变" class="headerlink" title="Ascii,GBK,Unicode 演变"></a>Ascii,GBK,Unicode 演变</h2><h4 id="Ascii"><a href="#Ascii" class="headerlink" title="Ascii"></a>Ascii</h4><p>&emsp;&emsp;Ascii(美国信息交换标准代码),它是一套电脑编码系统,使用连续的字节状态来表示英文文字。Ascii是一种单字节的编码系统,以至于最多只能有2的八次方种状态。Ascii是美国人的标准,并不能把全世界的语言都表示出来。最后出现了很多其他的编译系统,比如我们的GBK。</p>
-<h4 id="GBK"><a href="#GBK" class="headerlink" title="GBK"></a>GBK</h4><p>&emsp;&emsp;为了适应中国自己的需求,我们发明了一种GB2312编码:一个小于127的字符的意义与原来相同，但两个大于127的字符连在一起时，就表示一个汉字，前面的一个字节（高字节）从0xA1用到0xF7，后面一个字节（低字节）从0xA1到0xFE。但是中国的汉字太多了,还是没法满足我们的需要。于是在GB2312编码上进行扩展,只要第一个字节表示大于127就表示汉字,这种编码方式就是GBK。</p>
-<h4 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h4><p>&emsp;&emsp;当时各国都在各种搞一套,导致编码标准不统一。这时候国际标谁化组织开始统一标准,Unicode出现了。Unicode中对Ascii的127以下的编码方式保持不变,其他的重新进行编码。其中,每2个字节表示一个符号,这导致之前使用Ascii表示的符号多出了1个字节。Unicode并不完美。直到互联网的出现，为解决unicode如何在网络上传输的问题UTF出现,这也是我们要重点讲解的编码。</p>
-<h2 id="UTF"><a href="#UTF" class="headerlink" title="UTF"></a>UTF</h2><p>…未完待续</p>
-
-          
+</code></pre><h2 id="Ascii-GBK-Unicode-字符集"><a href="#Ascii-GBK-Unicode-字符集" class="headerlink" title="Ascii,GBK,Unicode 字符集"></a>Ascii,GBK,Unicode 字符集</h2><h3 id="Ascii"><a href="#Ascii" class="headerlink" title="Ascii"></a>Ascii</h3><p>&emsp;&emsp;Ascii(美国信息交换标准代码),它是一套电脑编码系统,使用连续的字节状态来表示英文文字。Ascii是一种单字节的编码系统,以至于最多只能有2的八次方种状态。Ascii是美国人的标准,并不能把全世界的语言都表示出来。最后出现了很多其他的编译系统,比如我们的GBK。</p>
+<h3 id="GBK"><a href="#GBK" class="headerlink" title="GBK"></a>GBK</h3><p>&emsp;&emsp;为了适应中国自己的需求,我们发明了一种GB2312编码:一个小于127的字符的意义与原来相同，但两个大于127的字符连在一起时，就表示一个汉字，前面的一个字节（高字节）从0xA1用到0xF7，后面一个字节（低字节）从0xA1到0xFE。但是中国的汉字太多了,还是没法满足我们的需要。于是在GB2312编码上进行扩展,只要第一个字节表示大于127就表示汉字,这种编码方式就是GBK。</p>
+<h3 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h3><p>&emsp;&emsp;当时各国都在各种搞一套,导致编码标准不统一。这时候国际标谁化组织开始统一标准,Unicode出现了。Unicode中对Ascii的127以下的编码方式保持不变,其他的重新进行编码。其中,Unicode目前普遍采用的是UCS-2(每2个字节表示一个符号),这导致之前使用Ascii表示的符号多出了1个字节。Unicode并不完美。直到互联网的出现，为解决unicode如何在网络上传输的问题UTF出现,这也是我们要重点讲解的编码。</p>
+<h2 id="Ascii-GBK-Unicode-和-UTF-UCS-区别"><a href="#Ascii-GBK-Unicode-和-UTF-UCS-区别" class="headerlink" title="Ascii,GBK,Unicode 和 UTF,UCS 区别"></a>Ascii,GBK,Unicode 和 UTF,UCS 区别</h2><p>&emsp;&emsp;Ascii,GBK,Unicode准确来说应该叫做字符集,对每个字符使用对应的唯一的代码值来表示,并没有规定使用多少个字节来表示。UTF,UCS是基于Unicode字符集的编码方式,使用对应的字节来表示字符。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
