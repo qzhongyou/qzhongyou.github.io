@@ -91,7 +91,7 @@
 <meta property="og:site_name" content="玉面の博客">
 <meta property="og:description" content="前言&amp;emsp;&amp;emsp;今天在对react做服务端渲染的时候,因为在使用antd组件的同时,也引用了对应的css文件,导致报错。错误信息:12/Users/xxx/xxx/node_modules/antd/lib/style/index.css:6@font-face &amp;#123; 报错原因和解决方案设想 报错原因因为服务端nodejs无法解析css,less等文件,导致报错。  解决方案设">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-12-15T15:50:02.000Z">
+<meta property="og:updated_time" content="2018-02-04T15:59:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React服务端渲染less文件引用问题">
 <meta name="twitter:description" content="前言&amp;emsp;&amp;emsp;今天在对react做服务端渲染的时候,因为在使用antd组件的同时,也引用了对应的css文件,导致报错。错误信息:12/Users/xxx/xxx/node_modules/antd/lib/style/index.css:6@font-face &amp;#123; 报错原因和解决方案设想 报错原因因为服务端nodejs无法解析css,less等文件,导致报错。  解决方案设">
@@ -342,6 +342,11 @@
 </li>
 </ul>
 <p>&emsp;&emsp;这样可以对不同类型的文件进行处理后,返回自己想得到的内容。<br>(二) 使用<code>require-hacker</code>模块,实现不同类型的文件的引用处理。上代码:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> require_hacker <span class="keyword">from</span> <span class="string">'require-hacker'</span>;</div><div class="line">require_hacker.hook(<span class="string">"less"</span>, path=&gt; &#123;</div><div class="line">    <span class="comment">//对文件处理,然后返回结果</span></div><div class="line">    <span class="keyword">return</span> xxx;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<h2 id="其他更好的方案"><a href="#其他更好的方案" class="headerlink" title="其他更好的方案"></a>其他更好的方案</h2><p>在GitHub上找到了个更好的方案。</p>
+<ol>
+<li>客户端跟服务端用同一套 webpack 打包后的资源。webpack-isomorphic-tools 可以很好的解决这个问题，或者最新的 webpack 版本 target: node 也能实现。  </li>
+<li>png/jpg/font 等文件直接忽略（在 babel-register 里可以设置），scss/css的话，用 css in js 的方式写。<br>(<a href="https://github.com/Leslie2014/blog/issues/2" target="_blank" rel="external">网站链接</a>)</li>
+</ol>
 <p>参考:<br><a href="https://github.com/catamphetamine/require-hacker" target="_blank" rel="external">require_hacker</a><br><a href="qzhongyou.github.io/2017/10/15/nodejs模块引入机制exports-module源码">nodejs模块引入机制exports&amp;module源码</a></p>
 
       
@@ -524,7 +529,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错原因和解决方案设想"><span class="nav-number">2.</span> <span class="nav-text">报错原因和解决方案设想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方案实现"><span class="nav-number">3.</span> <span class="nav-text">方案实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错原因和解决方案设想"><span class="nav-number">2.</span> <span class="nav-text">报错原因和解决方案设想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方案实现"><span class="nav-number">3.</span> <span class="nav-text">方案实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他更好的方案"><span class="nav-number">4.</span> <span class="nav-text">其他更好的方案</span></a></li></ol></div>
             
 
           </div>
