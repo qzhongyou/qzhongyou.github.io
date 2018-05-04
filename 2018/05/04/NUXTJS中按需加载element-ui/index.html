@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="mousewheel DOMMouseScroll,滚轮滚动。" />
+  <meta name="keywords" content="vuejs," />
 
 
 
@@ -83,21 +83,21 @@
 
 
 
-<meta name="description" content="学无止境、温故知新  故事是这样的 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。">
-<meta name="keywords" content="mousewheel DOMMouseScroll,滚轮滚动。">
+<meta name="description" content="前言因为生活和工作方面原因,虽然有时还是在学习,但是开年后一直好久没有写文章了。简单地写点什么吧。 问题通常我们在使用element-ui时都进行全局的加载,但是这会导致打出的包过大。所以为了减少包体积,我们进行按需加载。关于怎么实现按需加载,element-ui官方讲得很清楚,http://element-cn.eleme.io/2.3/#/zh-CN/component/quickstart。">
+<meta name="keywords" content="vuejs">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一个小功能引起对事件的回顾">
-<meta property="og:url" content="http://yoursite.com/2017/09/29/一个小功能引起对事件的回顾/index.html">
+<meta property="og:title" content="NUXTJS中按需加载element-ui">
+<meta property="og:url" content="http://yoursite.com/2018/05/04/NUXTJS中按需加载element-ui/index.html">
 <meta property="og:site_name" content="玉面の博客">
-<meta property="og:description" content="学无止境、温故知新  故事是这样的 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。">
+<meta property="og:description" content="前言因为生活和工作方面原因,虽然有时还是在学习,但是开年后一直好久没有写文章了。简单地写点什么吧。 问题通常我们在使用element-ui时都进行全局的加载,但是这会导致打出的包过大。所以为了减少包体积,我们进行按需加载。关于怎么实现按需加载,element-ui官方讲得很清楚,http://element-cn.eleme.io/2.3/#/zh-CN/component/quickstart。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://oxfr9vqx2.bkt.clouddn.com/asd.gif">
-<meta property="og:image" content="http://yoursite.com/img/1005354-20161222125521823-1914047378.png">
-<meta property="og:updated_time" content="2017-10-07T04:30:48.000Z">
+<meta property="og:image" content="http://oxfr9vqx2.bkt.clouddn.com/DFC79CF4-2D8B-49EF-A8C5-8040A571A905.png">
+<meta property="og:image" content="http://oxfr9vqx2.bkt.clouddn.com/32f710a8-6a5e-41d3-89aa-e52e13e83730.png">
+<meta property="og:updated_time" content="2018-05-04T08:24:34.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一个小功能引起对事件的回顾">
-<meta name="twitter:description" content="学无止境、温故知新  故事是这样的 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。">
-<meta name="twitter:image" content="http://oxfr9vqx2.bkt.clouddn.com/asd.gif">
+<meta name="twitter:title" content="NUXTJS中按需加载element-ui">
+<meta name="twitter:description" content="前言因为生活和工作方面原因,虽然有时还是在学习,但是开年后一直好久没有写文章了。简单地写点什么吧。 问题通常我们在使用element-ui时都进行全局的加载,但是这会导致打出的包过大。所以为了减少包体积,我们进行按需加载。关于怎么实现按需加载,element-ui官方讲得很清楚,http://element-cn.eleme.io/2.3/#/zh-CN/component/quickstart。">
+<meta name="twitter:image" content="http://oxfr9vqx2.bkt.clouddn.com/DFC79CF4-2D8B-49EF-A8C5-8040A571A905.png">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/29/一个小功能引起对事件的回顾/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/05/04/NUXTJS中按需加载element-ui/"/>
 
 
 
 
 
-  <title>一个小功能引起对事件的回顾 | 玉面の博客</title>
+  <title>NUXTJS中按需加载element-ui | 玉面の博客</title>
   
 
 
@@ -250,7 +250,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/29/一个小功能引起对事件的回顾/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/04/NUXTJS中按需加载element-ui/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="qzhongyou">
@@ -267,7 +267,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">一个小功能引起对事件的回顾</h1>
+          <h1 class="post-title" itemprop="name headline">NUXTJS中按需加载element-ui</h1>
         
 
         <div class="post-meta">
@@ -279,8 +279,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-29T09:34:57+08:00">
-                2017-09-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-04T15:48:40+08:00">
+                2018-05-04
               </time>
             
 
@@ -297,7 +297,7 @@
 
           
           
-             <span id="/2017/09/29/一个小功能引起对事件的回顾/" class="leancloud_visitors" data-flag-title="一个小功能引起对事件的回顾">
+             <span id="/2018/05/04/NUXTJS中按需加载element-ui/" class="leancloud_visitors" data-flag-title="NUXTJS中按需加载element-ui">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -328,37 +328,18 @@
       
 
       
-        <blockquote>
-<p>学无止境、温故知新</p>
-</blockquote>
-<h2 id="故事是这样的"><a href="#故事是这样的" class="headerlink" title="故事是这样的"></a>故事是这样的</h2><p> 昨天，遇到个需求，需要做到类似于图一左边’good’模块的效果，当div滚轮滑动到最底部的时候，最外成文档不滑动。（注意，页面滚动其实是文档不是body）但是，正常情况下，效果应该类似于’bad’模块。<a id="more"></a><br> <img src="http://oxfr9vqx2.bkt.clouddn.com/asd.gif" width="200"><br> 图一</p>
-<p> 先想想自己怎么实现。</p>
-<h2 id="解决方案（一）"><a href="#解决方案（一）" class="headerlink" title="解决方案（一）"></a>解决方案（一）</h2><p> 当body或者html脱离文档流，页面自然不会滚动。div内部却可以滚动。直接上代码:</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;div id=&quot;good&quot;&gt;&lt;/div&gt;</div><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;// DOMMouseScroll 兼容火狐</div><div class="line">     $(&quot;body&quot;).css(&#123;position: &apos;fixed&apos;&#125;);  // 设置fixed脱离文档流</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p> 或者<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;div id=&quot;good&quot;&gt;&lt;/div&gt;</div><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;// DOMMouseScroll 兼容火狐</div><div class="line">     $(&quot;body&quot;).css(&#123;overflow: &apos;hidden&apos;&#125;);  // 设置fixed脱离文档流</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>但是,上面的代码也不是百分百的成功,比如:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">body&#123;</div><div class="line">   width:100%;</div><div class="line">   heigth:100%;</div><div class="line">&#125;</div><div class="line">.child&#123;</div><div class="line">   width:100%;</div><div class="line">   heigth:100%;</div><div class="line">   overflow:scroll;</div><div class="line">&#125;</div><div class="line">&lt;body&gt;</div><div class="line">    &lt;div class=&quot;child&quot;&gt;</div><div class="line">        内容....</div><div class="line">    &lt;/div&gt;</div><div class="line">&lt;/body&gt;</div></pre></td></tr></table></figure>
-<p>而且,通过改变样式的方法来控制滚动,也许会造成页面上其他样式的问题,所以并不完美。</p>
-<h2 id="解决方案（二）"><a href="#解决方案（二）" class="headerlink" title="解决方案（二）"></a>解决方案（二）</h2><p>方案一并不完美,我们是否可以参数通过事件来阻止滚轮使页面滚动的发生。例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;</div><div class="line">      e.preventDefault(); //阻止滚动</div><div class="line">   &#125;</div></pre></td></tr></table></figure></p>
-<p>这时候,发现body不在滚动了,但是div也不能滚动了。这个方案似乎也陷入了困境。对代码进行改进。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">$(&apos;#good&apos;).bind(&apos;mousewheel DOMMouseScroll&apos;, function(e) &#123;</div><div class="line">    var scrollTo = null;</div><div class="line">    if (e.type == &apos;mousewheel&apos;) &#123;</div><div class="line">        //jq对原生event进行了封装,e.originalEvent等于原生event</div><div class="line">        scrollTo = (e.originalEvent.wheelDelta * -1); </div><div class="line">    &#125;</div><div class="line">    else if (e.type == &apos;DOMMouseScroll&apos;) &#123;</div><div class="line">        scrollTo = 40 * e.originalEvent.detail;</div><div class="line">    &#125;</div><div class="line">    if (scrollTo) &#123;</div><div class="line">        e.preventDefault();</div><div class="line">        $(this).scrollTop(scrollTo + $(this).scrollTop());</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p> 这时候需求得到了解决。</p>
-<h2 id="滚轮滚动事件基础"><a href="#滚轮滚动事件基础" class="headerlink" title="滚轮滚动事件基础"></a>滚轮滚动事件基础</h2><ol>
-<li>mousewheel和DOMMouseScroll只是滚轮滚动的时候触发和scroll是不相同的。</li>
-<li>FireFox使用的DOMMouseScroll事件,其他浏览器使用的mousewheel事件,为了兼容一般同时使用。</li>
-<li>FireFox中没有wheelDelta属性,使用的是detail,每次向下滚动一次detail的值为120,而wheelDelta的值为-3。</li>
-</ol>
-<h2 id="事件冒泡和事件捕获"><a href="#事件冒泡和事件捕获" class="headerlink" title="事件冒泡和事件捕获"></a>事件冒泡和事件捕获</h2><p> 这是一个老得掉牙的问题,但是还是值得在这里写出的,毕竟是事件的基础知识,不写的话,文章总觉得缺点什么。<br> <img src="/img/1005354-20161222125521823-1914047378.png"><br> (网络拷贝图片)通过上图,可以得知,事件流从window开始进行事件捕获,然后到目标元素,再事件冒泡到到window。<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">var body = document.getElementsByTagName(&quot;body&quot;)[0];</div><div class="line">var div =document.getElementsByTagName(&quot;div&quot;)[0];</div><div class="line">body.addEventListener(&quot;click&quot;,function(event)&#123;console.log(&quot;body捕获&quot;+event.eventPhase)&#125;,true)</div><div class="line">body.addEventListener(&quot;click&quot;,function(event)&#123;console.log(&quot;body冒泡&quot;+event.eventPhase)&#125;,false)</div><div class="line">div.addEventListener(&quot;click&quot;,function(event)&#123;console.log(&quot;div捕获&quot;+event.eventPhase)&#125;,true)</div><div class="line">div.addEventListener(&quot;click&quot;,function(event)&#123;console.log(&quot;div冒泡&quot;+event.eventPhase)&#125;,false)</div><div class="line"></div><div class="line">运行结果:</div><div class="line">        body捕获1</div><div class="line">        div捕获2</div><div class="line">        div冒泡2</div><div class="line">        body冒泡3</div></pre></td></tr></table></figure></p>
-<p> addEventListener监听函数最后一个参数为true表示捕获事件,为false表示冒泡,默认为false。ie8及以下不支持捕获。<br> event.eventPhase表示当前事件流处于什么阶段,1位捕获,2位当前目标,3位冒泡。</p>
-<h2 id="事件兼容-IE"><a href="#事件兼容-IE" class="headerlink" title="事件兼容 IE"></a>事件兼容 IE</h2><h4 id="事件监听和注销监听"><a href="#事件监听和注销监听" class="headerlink" title="事件监听和注销监听"></a>事件监听和注销监听</h4><p> 添加:<br> IE下:attachEvent。<code>attachEvent(&#39;on&#39;+type,callback)</code><br> 其他:addEventListener。  <code>addEventListener(type,callback,[false|true])</code><br> 移除:<br> IE下:detachEvent。<br> 其他:removeEvent。</p>
-<h4 id="事件event"><a href="#事件event" class="headerlink" title="事件event"></a>事件event</h4><ol>
-<li>IE下没有event,使用设置event =window.event。</li>
-<li>IE下 event.srcElement等于其他浏览器的event.target。</li>
-<li>阻止默认IE下 event.returnValue = false等于其他浏览器的event.preventDefault();</li>
-<li><p>一般情况。this在IE下等于window,其他的是this等于event.currentTarget。</p>
-<p>最后,事件还有什么性能优化的呀,事件代理,内存泄漏呀,我也不想说了,头都写晕了。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>因为生活和工作方面原因,虽然有时还是在学习,但是开年后一直好久没有写文章了。简单地写点什么吧。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>通常我们在使用element-ui时都进行全局的加载,但是这会导致打出的包过大。所以为了减少包体积,我们进行按需加载。<br>关于怎么实现按需加载,element-ui官方讲得很清楚,<a href="http://element-cn.eleme.io/2.3/#/zh-CN/component/quickstart" target="_blank" rel="external">http://element-cn.eleme.io/2.3/#/zh-CN/component/quickstart</a>。<br>但是,并没有说怎么在nuxtjs中使用element-ui按需加载。(页面最后将了怎么使用nuxtjs使用element-ui,但是是全局加载)。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ul>
+<li>尝试(一)<h4 id="主要配置"><a href="#主要配置" class="headerlink" title="主要配置:"></a>主要配置:</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//babel部分</span></div><div class="line"> &#123;</div><div class="line">     presets: [</div><div class="line">         [<span class="string">"es2015"</span>, &#123;<span class="attr">modules</span>: <span class="literal">false</span>&#125;],</div><div class="line">         <span class="string">"stage-2"</span></div><div class="line">     ],</div><div class="line">     plugins: [</div><div class="line">          <span class="string">"transform-vue-jsx"</span>,</div><div class="line">          <span class="string">"transform-runtime"</span>,</div><div class="line">          [</div><div class="line">               <span class="string">"component"</span>,</div><div class="line">               &#123;</div><div class="line">                    <span class="string">"libraryName"</span>: <span class="string">"element-ui"</span>,</div><div class="line">                    <span class="string">"styleLibraryName"</span>: <span class="string">"theme-chalk"</span></div><div class="line">               &#125;</div><div class="line">          ]</div><div class="line">     ]</div><div class="line"> &#125;</div><div class="line"> <span class="comment">//vendor部分</span></div><div class="line">  vendor: [<span class="string">'axios'</span>, <span class="string">'vue-lazyload'</span>, <span class="string">'element-ui'</span>]</div><div class="line">  </div><div class="line">  <span class="comment">//~plugins/element-ui.js</span></div><div class="line">  <span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">'vue'</span>;</div><div class="line">  <span class="keyword">import</span> &#123; Button &#125; <span class="keyword">from</span> <span class="string">'element-ui'</span></div><div class="line">  Vue.component(Button.name, Button)</div></pre></td></tr></table></figure>
 </li>
-</ol>
+</ul>
+<h4 id="打包后结果"><a href="#打包后结果" class="headerlink" title="打包后结果:"></a>打包后结果:</h4><p><img src="http://oxfr9vqx2.bkt.clouddn.com/DFC79CF4-2D8B-49EF-A8C5-8040A571A905.png"></p>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析:"></a>分析:</h4><p>可以看出element-ui还是把全部都打包进去了,而不是按需加载了Button组件,这是为什么呢?</p>
+<h4 id="最终方案"><a href="#最终方案" class="headerlink" title="最终方案:"></a>最终方案:</h4><p>修改配置将vendor中的element-ui改为~plugins/element-ui:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vendor: [<span class="string">'axios'</span>, <span class="string">'vue-lazyload'</span>, <span class="string">'~plugins/element-ui'</span>]</div></pre></td></tr></table></figure></p>
+<h4 id="修改后结果"><a href="#修改后结果" class="headerlink" title="修改后结果:"></a>修改后结果:</h4><p><img src="http://oxfr9vqx2.bkt.clouddn.com/32f710a8-6a5e-41d3-89aa-e52e13e83730.png"></p>
+<h4 id="修改后分析"><a href="#修改后分析" class="headerlink" title="修改后分析:"></a>修改后分析:</h4><p>可以看见已经实现了按需加载。那为什么配置为<code>~plugins/element-ui</code>就能实现呢。其实,这和<code>webpack</code>的<code>tree-shaking</code>有关。<br>当我们设置为<code>element-ui</code>时,打包过程中webpack会对<code>element-ui</code>进行tree-shaking处理。但是,element-ui默认会引用所有的组件,所以这时候<br>tree-shaking并不会删减组件,起到按需加载的作用。但是当我们设置为<code>~plugins/element-ui</code>时,因为该文件中只使用了Button组件,使用tree-shaking会<br>删除其他没有使用的组件,起到按需加载的作用。</p>
+<h4 id="提示"><a href="#提示" class="headerlink" title="提示:"></a>提示:</h4><p>使用tree-shaking需要注意1. 配置<code>modules: false</code>。2.压缩代码。 结束~~~</p>
 
       
     </div>
@@ -376,9 +357,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/事件/" rel="tag"># 事件</a>
-          
-            <a href="/tags/滚动/" rel="tag"># 滚动</a>
+            <a href="/tags/vuejs/" rel="tag"># vuejs</a>
           
         </div>
       
@@ -391,8 +370,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/28/移动端高清方案/" rel="next" title="移动端高清方案">
-                <i class="fa fa-chevron-left"></i> 移动端高清方案
+              <a href="/2018/01/11/unicode utf-8-utf-16-gbk编码区别详解/" rel="next" title="Ascii,Gbk,Unicode字符集和UTF-8,UTF-16编码详解">
+                <i class="fa fa-chevron-left"></i> Ascii,Gbk,Unicode字符集和UTF-8,UTF-16编码详解
               </a>
             
           </div>
@@ -400,10 +379,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/10/06/跨域请求方法/" rel="prev" title="跨域请求方法">
-                跨域请求方法 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -542,7 +517,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#故事是这样的"><span class="nav-number">1.</span> <span class="nav-text">故事是这样的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案（一）"><span class="nav-number">2.</span> <span class="nav-text">解决方案（一）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案（二）"><span class="nav-number">3.</span> <span class="nav-text">解决方案（二）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#滚轮滚动事件基础"><span class="nav-number">4.</span> <span class="nav-text">滚轮滚动事件基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件冒泡和事件捕获"><span class="nav-number">5.</span> <span class="nav-text">事件冒泡和事件捕获</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件兼容-IE"><span class="nav-number">6.</span> <span class="nav-text">事件兼容 IE</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#事件监听和注销监听"><span class="nav-number">6.0.1.</span> <span class="nav-text">事件监听和注销监听</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#事件event"><span class="nav-number">6.0.2.</span> <span class="nav-text">事件event</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主要配置"><span class="nav-number">3.0.1.</span> <span class="nav-text">主要配置:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#打包后结果"><span class="nav-number">3.0.2.</span> <span class="nav-text">打包后结果:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">3.0.3.</span> <span class="nav-text">分析:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最终方案"><span class="nav-number">3.0.4.</span> <span class="nav-text">最终方案:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改后结果"><span class="nav-number">3.0.5.</span> <span class="nav-text">修改后结果:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改后分析"><span class="nav-number">3.0.6.</span> <span class="nav-text">修改后分析:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#提示"><span class="nav-number">3.0.7.</span> <span class="nav-text">提示:</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
